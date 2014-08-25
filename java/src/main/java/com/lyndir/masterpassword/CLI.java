@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.lyndir.lhunath.masterpassword;
+package com.lyndir.masterpassword;
 
 import com.google.common.io.LineReader;
 import com.lyndir.lhunath.opal.system.logging.Logger;
