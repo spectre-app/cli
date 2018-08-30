@@ -1,5 +1,5 @@
 ### CMAKE
-project( mpw C )
+project( masterpassword-cli C )
 cmake_minimum_required( VERSION 3.0.2 )
 
 
@@ -39,8 +39,8 @@ endif()
 ### DEPENDENCIES
 function( use_mpw_sodium t r )
     if( USE_SODIUM )
-        target_link_libraries(  "${t}" sodium )
-        target_compile_definitions( "${t}" PUBLIC -DMPW_SODIUM=1 )
+        target_link_libraries(  "${t}" PRIVATE sodium )
+        target_compile_definitions( "${t}" PRIVATE -DMPW_SODIUM=1 )
         message( STATUS         "${t}: USE_SODIUM is enabled." )
 
     elseif( r STREQUAL "required" )
@@ -56,9 +56,9 @@ function( use_mpw_color t )
     find_package( Curses )
     if( USE_COLOR )
         if ( CURSES_FOUND )
-            target_include_directories( "${t}" PUBLIC ${CURSES_INCLUDE_DIR} )
-            target_link_libraries( "${t}" ${CURSES_LIBRARIES} )
-            target_compile_definitions( "${t}" PUBLIC -DMPW_COLOR=1 ${CURSES_DEFINITIONS} )
+            target_include_directories( "${t}" PRIVATE ${CURSES_INCLUDE_DIR} )
+            target_link_libraries( "${t}" PRIVATE ${CURSES_LIBRARIES} )
+            target_compile_definitions( "${t}" PRIVATE -DMPW_COLOR=1 ${CURSES_DEFINITIONS} )
             message( STATUS     "${t}: USE_COLOR is enabled." )
 
         elseif( r STREQUAL "required" )
@@ -80,8 +80,8 @@ endfunction()
 
 function( use_mpw_json t )
     if( USE_JSON )
-        target_link_libraries(  "${t}" json-c )
-        target_compile_definitions( "${t}" PUBLIC -DMPW_JSON=1 )
+        target_link_libraries(  "${t}" PRIVATE json-c )
+        target_compile_definitions( "${t}" PRIVATE -DMPW_JSON=1 )
         message( STATUS         "${t}: USE_JSON is enabled." )
 
     elseif( r STREQUAL "required" )
@@ -97,9 +97,9 @@ function( use_mpw_xml t r )
     find_package( LibXml2 )
     if( USE_XML )
         if ( LIBXML2_FOUND )
-            target_include_directories( "${t}" PUBLIC ${LIBXML2_INCLUDE_DIR} )
-            target_link_libraries( "${t}" ${LIBXML2_LIBRARIES} )
-            target_compile_definitions( "${t}" PUBLIC -DMPW_XML=1 ${LIBXML2_DEFINITIONS} )
+            target_include_directories( "${t}" PRIVATE ${LIBXML2_INCLUDE_DIR} )
+            target_link_libraries( "${t}" PRIVATE ${LIBXML2_LIBRARIES} )
+            target_compile_definitions( "${t}" PRIVATE -DMPW_XML=1 ${LIBXML2_DEFINITIONS} )
             message( STATUS     "${t}: USE_XML is enabled." )
 
         elseif( r STREQUAL "required" )
@@ -123,9 +123,11 @@ endfunction()
 ### TARGET: MPW
 if( BUILD_MPW )
     # target
-    add_executable( mpw "core/base64.c" "core/aes.c" "core/mpw-algorithm.c" "core/mpw-types.c" "core/mpw-util.c" "core/mpw-marshal-util.c" "core/mpw-marshal.c"
-                        "cli/mpw-cli-util.c" "cli/mpw-cli.c" )
-    target_include_directories( mpw PUBLIC core cli )
+    add_executable( mpw "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c" "../core/src/mpw-types.c" "../core/src/mpw-util.c"
+                        "../core/src/mpw-marshal-util.c" "../core/src/mpw-marshal.c"
+                        "src/mpw-cli-util.c" "src/mpw-cli.c" )
+    target_include_directories( mpw PUBLIC ../core/src src )
+    install( TARGETS mpw RUNTIME DESTINATION bin )
 
     # dependencies
     use_mpw_sodium( mpw required )
@@ -137,23 +139,25 @@ endif()
 ### TARGET: MPW-BENCH
 if( BUILD_MPW_BENCH )
     # target
-    add_executable( mpw_bench "core/base64.c" "core/aes.c" "core/mpw-algorithm.c" "core/mpw-types.c" "core/mpw-util.c"
-                        "cli/mpw-bench.c" )
-    target_include_directories( mpw_bench PUBLIC core cli )
+    add_executable( mpw-bench "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c" "../core/src/mpw-types.c" "../core/src/mpw-util.c"
+                              "src/mpw-bench.c" )
+    target_include_directories( mpw-bench PUBLIC ../core/src src )
+    install( TARGETS mpw-bench RUNTIME DESTINATION bin )
 
     # dependencies
-    use_mpw_sodium( mpw_bench required )
+    use_mpw_sodium( mpw-bench required )
 endif()
 
 
 ### TARGET: MPW-TESTS
 if( BUILD_MPW_TESTS )
     # target
-    add_executable( mpw_tests "core/base64.c" "core/aes.c" "core/mpw-algorithm.c" "core/mpw-types.c" "core/mpw-util.c"
-                              "cli/mpw-tests-util.c" "cli/mpw-tests.c" )
-    target_include_directories( mpw_tests PUBLIC core cli )
+    add_executable( mpw-tests "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c" "../core/src/mpw-types.c" "../core/src/mpw-util.c"
+                              "src/mpw-tests-util.c" "src/mpw-tests.c" )
+    target_include_directories( mpw-tests PUBLIC ../core/src src )
+    install( TARGETS mpw-tests RUNTIME DESTINATION bin )
 
     # dependencies
-    use_mpw_sodium( mpw_tests required )
-    use_mpw_xml( mpw_tests required )
+    use_mpw_sodium( mpw-tests required )
+    use_mpw_xml( mpw-tests required )
 endif()

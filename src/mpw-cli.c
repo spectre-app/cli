@@ -34,14 +34,14 @@
 static void usage() {
 
     inf( ""
-            "  Master Password v%s\n"
+            "  Master Password v%s - CLI\n"
             "--------------------------------------------------------------------------------\n"
-            "      https://masterpasswordapp.com\n", stringify_def( MP_VERSION ) );
+            "      https://masterpassword.app\n", stringify_def( MP_VERSION ) );
     inf( ""
             "\nUSAGE\n\n"
             "  mpw [-u|-U full-name] [-m fd] [-t pw-type] [-P value] [-c counter]\n"
             "      [-a version] [-p purpose] [-C context] [-f|F format] [-R 0|1]\n"
-            "      [-v|-q] [-h] [site-name]\n" );
+            "      [-v|-q]* [-h] [site-name]\n" );
     inf( ""
             "  -u full-name Specify the full name of the user.\n"
             "               -u checks the master password against the config,\n"
@@ -110,6 +110,8 @@ static void usage() {
             "  -q           Decrease output verbosity (can be repeated).\n" );
     inf( ""
             "  -h           Show this help output instead of performing any operation.\n" );
+    inf( ""
+            "  site-name    Name of the site for which to generate a token.\n" );
     inf( ""
             "\nENVIRONMENT\n\n"
             "  %-12s The full name of the user (see -u).\n"
@@ -528,7 +530,7 @@ void cli_user(Arguments *args, Operation *operation) {
                 operation->fullName, operation->masterPassword, MPAlgorithmVersionCurrent );
 }
 
-void cli_site(Arguments __unused *args, Operation *operation) {
+void cli_site(Arguments *args, Operation *operation) {
 
     if (!operation->siteName)
         abort();
@@ -544,7 +546,7 @@ void cli_site(Arguments __unused *args, Operation *operation) {
                 operation->user, operation->siteName, operation->user->defaultType, MPCounterValueDefault, operation->user->algorithm );
 }
 
-void cli_question(Arguments __unused *args, Operation *operation) {
+void cli_question(Arguments *args, Operation *operation) {
 
     if (!operation->site)
         abort();
@@ -567,7 +569,7 @@ void cli_question(Arguments __unused *args, Operation *operation) {
     }
 }
 
-void cli_operation(Arguments __unused *args, Operation *operation) {
+void cli_operation(Arguments *args, Operation *operation) {
 
     mpw_free_string( &operation->identicon );
     operation->identicon = mpw_identicon_str( mpw_identicon( operation->user->fullName, operation->user->masterPassword ) );
@@ -768,7 +770,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
     operation->site->uses++;
 }
 
-void cli_save(Arguments __unused *args, Operation *operation) {
+void cli_save(Arguments *args, Operation *operation) {
 
     if (operation->sitesFormat == MPMarshalFormatNone)
         return;
