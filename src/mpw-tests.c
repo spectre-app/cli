@@ -125,7 +125,7 @@ int main(int argc, char *const argv[]) {
             }
 
             // 1. calculate the master key.
-            MPMasterKey masterKey = mpw_master_key(
+            const MPMasterKey *masterKey = mpw_master_key(
                     (char *)fullName, (char *)masterPassword, algorithm );
             if (!masterKey) {
                 ftl( "Couldn't derive master key." );
@@ -133,7 +133,7 @@ int main(int argc, char *const argv[]) {
             }
 
             // Check the master key.
-            MPKeyID testKeyID = mpw_id_buf( masterKey, MPMasterKeySize );
+            MPKeyID testKeyID = mpw_id_buf( masterKey, sizeof( *masterKey ) );
             if (xmlStrcmp( keyID, BAD_CAST testKeyID ) != 0) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", testKeyID, keyID );
@@ -143,7 +143,7 @@ int main(int argc, char *const argv[]) {
             // 2. calculate the site password.
             const char *testResult = mpw_site_result(
                     masterKey, (char *)siteName, siteCounter, keyPurpose, (char *)keyContext, resultType, NULL, algorithm );
-            mpw_free( &masterKey, MPMasterKeySize );
+            mpw_free( &masterKey, sizeof( *masterKey ) );
             if (!testResult) {
                 ftl( "Couldn't derive site password." );
                 continue;

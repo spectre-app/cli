@@ -718,7 +718,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
                 operation->user->fullName, operation->purposeResult, operation->site->siteName, operation->identicon );
 
     // Check user keyID.
-    MPMasterKey masterKey = NULL;
+    const MPMasterKey *masterKey = NULL;
     if (operation->user->masterKeyProvider)
         masterKey = operation->user->masterKeyProvider( operation->user->algorithm, operation->user->fullName );
     if (!masterKey) {
@@ -726,18 +726,18 @@ void cli_mpw(Arguments *args, Operation *operation) {
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
-    MPKeyID keyID = mpw_id_buf( masterKey, MPMasterKeySize );
+    MPKeyID keyID = mpw_id_buf( masterKey, sizeof( *masterKey ) );
     if (!operation->user->keyID)
         operation->user->keyID = mpw_strdup( keyID );
     else if (!mpw_id_buf_equals( keyID, operation->user->keyID )) {
         ftl( "Master key mismatch." );
-        mpw_free( &masterKey, MPMasterKeySize );
+        mpw_free( &masterKey, sizeof( *masterKey ) );
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
 
     // Resolve master key for site.
-    mpw_free( &masterKey, MPMasterKeySize );
+    mpw_free( &masterKey, sizeof( *masterKey ) );
     if (operation->user->masterKeyProvider)
         masterKey = operation->user->masterKeyProvider( operation->site->algorithm, operation->user->fullName );
     if (!masterKey) {
@@ -753,7 +753,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
                 operation->keyPurpose, operation->keyContext, operation->resultType, operation->resultParam,
                 operation->site->algorithm ))) {
             ftl( "Couldn't encrypt site result." );
-            mpw_free( &masterKey, MPMasterKeySize );
+            mpw_free( &masterKey, sizeof( *masterKey ) );
             cli_free( args, operation );
             exit( EX_SOFTWARE );
         }
@@ -789,7 +789,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
     // Generate result.
     const char *result = mpw_site_result( masterKey, operation->site->siteName, operation->siteCounter,
             operation->keyPurpose, operation->keyContext, operation->resultType, operation->resultParam, operation->site->algorithm );
-    mpw_free( &masterKey, MPMasterKeySize );
+    mpw_free( &masterKey, sizeof( *masterKey ) );
     if (!result) {
         ftl( "Couldn't generate site result." );
         cli_free( args, operation );
@@ -843,7 +843,7 @@ void cli_save(Arguments *args, Operation *operation) {
 
 static Operation *__cli_masterKeyProvider_currentOperation = NULL;
 
-static bool __cli_masterKeyProvider_op(MPMasterKey *currentKey, MPAlgorithmVersion *currentAlgorithm,
+static bool __cli_masterKeyProvider_op(const MPMasterKey **currentKey, MPAlgorithmVersion *currentAlgorithm,
         MPAlgorithmVersion algorithm, const char *fullName) {
 
     if (!currentKey)

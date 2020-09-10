@@ -184,7 +184,7 @@ const char *mpw_path(const char *prefix, const char *extension) {
         return NULL;
 
     // Compose filename.
-    char *path = mpw_strdup( mpw_str( "%s.%s", prefix, extension ) );
+    const char *path = mpw_strdup( mpw_str( "%s.%s", prefix, extension ) );
     if (!path)
         return NULL;
 
@@ -192,10 +192,9 @@ const char *mpw_path(const char *prefix, const char *extension) {
     for (char *slash; (slash = strstr( path, "/" )); *slash = '_');
 
     // Resolve user's home directory.
-    char *homeDir = NULL;
-    if (!homeDir)
-        if ((homeDir = getenv( "HOME" )))
-            homeDir = mpw_strdup( homeDir );
+    const char *homeDir = NULL;
+    if ((homeDir = getenv( "HOME" )))
+        homeDir = mpw_strdup( homeDir );
     if (!homeDir)
         if ((homeDir = getenv( "USERPROFILE" )))
             homeDir = mpw_strdup( homeDir );
@@ -215,8 +214,8 @@ const char *mpw_path(const char *prefix, const char *extension) {
     // Compose pathname.
     if (homeDir) {
         const char *homePath = mpw_str( "%s/.mpw.d/%s", homeDir, path );
-        free( homeDir );
-        free( path );
+        free( (void *)homeDir );
+        free( (void *)path );
 
         if (homePath)
             path = mpw_strdup( homePath );
@@ -243,7 +242,7 @@ bool mpw_mkdirs(const char *filePath) {
 
     // Walk the path.
     bool success = true;
-    char *path = mpw_strndup( filePath, (size_t)(pathEnd - filePath) );
+    char *path = (char *)mpw_strndup( filePath, (size_t)(pathEnd - filePath) );
     for (char *dirName = strtok( path, "/" ); success && dirName; dirName = strtok( NULL, "/" )) {
         if (!strlen( dirName ))
             continue;
@@ -320,14 +319,14 @@ static int mpw_tputc(int c) {
     return ERR;
 }
 
-static char *mpw_tputs(const char *str, int affcnt) {
+static const char *mpw_tputs(const char *str, int affcnt) {
 
     if (str_tputs)
         mpw_free( &str_tputs, str_tputs_max );
     str_tputs = calloc( str_tputs_max, sizeof( char ) );
     str_tputs_cursor = -1;
 
-    char *result = tputs( str, affcnt, mpw_tputc ) == ERR? NULL: mpw_strndup( str_tputs, str_tputs_max );
+    const char *result = tputs( str, affcnt, mpw_tputc ) == ERR? NULL: mpw_strndup( str_tputs, str_tputs_max );
     if (str_tputs)
         mpw_free( &str_tputs, str_tputs_max );
 
@@ -338,7 +337,7 @@ static char *mpw_tputs(const char *str, int affcnt) {
 
 const char *mpw_identicon_render(MPIdenticon identicon) {
 
-    char *colorString, *resetString;
+    const char *colorString, *resetString;
 #if MPW_COLOR
     if (mpw_setupterm()) {
         colorString = mpw_tputs( tparm( tgetstr( "AF", NULL ), identicon.color ), 1 );

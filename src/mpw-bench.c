@@ -74,7 +74,7 @@ int main(int argc, char *const argv[]) {
     struct timeval startTime;
     unsigned int iterations;
     float percent;
-    MPMasterKey masterKey;
+    const MPMasterKey *masterKey;
 
     // Start HMAC-SHA-256
     // Similar to phase-two of mpw
@@ -87,7 +87,7 @@ int main(int argc, char *const argv[]) {
     }
     mpw_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
-        free( (void *)mpw_hash_hmac_sha256( masterKey, MPMasterKeySize, sitePasswordInfo, 128 ) );
+        free( (void *)mpw_hash_hmac_sha256( masterKey, sizeof( *masterKey ), sitePasswordInfo, 128 ) );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rhmac-sha-256: iteration %d / %d (%.0f%%)..", i, iterations, percent );
