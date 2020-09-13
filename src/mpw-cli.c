@@ -202,7 +202,7 @@ int main(const int argc, char *const argv[]) {
             .sitesFormatFixed = false,
             .sitesFormat = MPMarshalFormatDefault,
             .keyPurpose = MPKeyPurposeAuthentication,
-            .resultType = MPResultTypeDefault,
+            .resultType = MPResultTypeDefaultResult,
             .siteCounter = MPCounterValueDefault,
     };
 

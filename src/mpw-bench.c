@@ -68,7 +68,7 @@ int main(int argc, char *const argv[]) {
     const char *masterPassword = "banana colored duckling";
     const char *siteName = "masterpassword.app";
     const MPCounterValue siteCounter = MPCounterValueDefault;
-    const MPResultType resultType = MPResultTypeDefault;
+    const MPResultType resultType = MPResultTypeDefaultResult;
     const MPKeyPurpose keyPurpose = MPKeyPurposeAuthentication;
     const char *keyContext = NULL;
     struct timeval startTime;
