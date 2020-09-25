@@ -184,7 +184,7 @@ const char *mpw_path(const char *prefix, const char *extension) {
         return NULL;
 
     // Compose filename.
-    const char *path = mpw_strdup( mpw_str( "%s.%s", prefix, extension ) );
+    const char *path = mpw_str( "%s.%s", prefix, extension );
     if (!path)
         return NULL;
 
@@ -201,7 +201,7 @@ const char *mpw_path(const char *prefix, const char *extension) {
     if (!homeDir) {
         const char *homeDrive = getenv( "HOMEDRIVE" ), *homePath = getenv( "HOMEPATH" );
         if (homeDrive && homePath)
-            homeDir = mpw_strdup( mpw_str( "%s%s", homeDrive, homePath ) );
+            homeDir = mpw_str( "%s%s", homeDrive, homePath );
     }
     if (!homeDir) {
         struct passwd *passwd = getpwuid( getuid() );
@@ -214,11 +214,12 @@ const char *mpw_path(const char *prefix, const char *extension) {
     // Compose pathname.
     if (homeDir) {
         const char *homePath = mpw_str( "%s/.mpw.d/%s", homeDir, path );
-        free( (void *)homeDir );
-        free( (void *)path );
+        mpw_free_string( &homeDir );
 
-        if (homePath)
-            path = mpw_strdup( homePath );
+        if (homePath) {
+            mpw_free_string( &path );
+            path = homePath;
+        }
     }
 
     return path;
@@ -263,7 +264,7 @@ const char *mpw_read_fd(int fd) {
     char *buf = NULL;
     size_t blockSize = 4096, bufSize = 0, bufOffset = 0;
     ssize_t readSize = 0;
-    while ((mpw_realloc( &buf, &bufSize, blockSize )) &&
+    while ((mpw_realloc( &buf, &bufSize, bufSize + blockSize )) &&
            ((readSize = read( fd, buf + bufOffset, blockSize )) > 0));
     if (readSize == ERR)
         mpw_free( &buf, bufSize );
@@ -278,7 +279,7 @@ const char *mpw_read_file(FILE *file) {
 
     char *buf = NULL;
     size_t blockSize = 4096, bufSize = 0, bufOffset = 0, readSize = 0;
-    while ((mpw_realloc( &buf, &bufSize, blockSize )) &&
+    while ((mpw_realloc( &buf, &bufSize, bufSize + blockSize )) &&
            (bufOffset += (readSize = fread( buf + bufOffset, 1, blockSize, file ))) &&
            (readSize == blockSize));
     if (ferror( file ))
@@ -337,18 +338,13 @@ static const char *mpw_tputs(const char *str, int affcnt) {
 
 const char *mpw_identicon_render(MPIdenticon identicon) {
 
-    const char *colorString, *resetString;
+    const char *colorString = NULL, *resetString = NULL;
 #if MPW_COLOR
     if (mpw_setupterm()) {
         colorString = mpw_tputs( tparm( tgetstr( "AF", NULL ), identicon.color ), 1 );
         resetString = mpw_tputs( tgetstr( "me", NULL ), 1 );
     }
-    else
 #endif
-    {
-        colorString = calloc( 1, sizeof( char ) );
-        resetString = calloc( 1, sizeof( char ) );
-    }
 
     const char *str = mpw_str( "%s%s%s%s%s%s",
             colorString? colorString: "",
@@ -356,5 +352,5 @@ const char *mpw_identicon_render(MPIdenticon identicon) {
             resetString? resetString: "" );
     mpw_free_strings( &colorString, &resetString, NULL );
 
-    return mpw_strdup( str );
+    return str;
 }

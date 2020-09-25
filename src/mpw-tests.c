@@ -96,7 +96,7 @@ int main(int argc, char *const argv[]) {
         MPAlgorithmVersion algorithm = (MPAlgorithmVersion)mpw_xmlTestCaseInteger( testCase, "algorithm" );
         xmlChar *fullName = mpw_xmlTestCaseString( testCase, "fullName" );
         xmlChar *masterPassword = mpw_xmlTestCaseString( testCase, "masterPassword" );
-        xmlChar *keyID = mpw_xmlTestCaseString( testCase, "keyID" );
+        MPKeyID keyID = mpw_id_str( (char *)mpw_xmlTestCaseString( testCase, "keyID" ) );
         xmlChar *siteName = mpw_xmlTestCaseString( testCase, "siteName" );
         MPCounterValue siteCounter = (MPCounterValue)mpw_xmlTestCaseInteger( testCase, "siteCounter" );
         xmlChar *resultTypeString = mpw_xmlTestCaseString( testCase, "resultType" );
@@ -134,9 +134,9 @@ int main(int argc, char *const argv[]) {
 
             // Check the master key.
             MPKeyID testKeyID = mpw_id_buf( masterKey, sizeof( *masterKey ) );
-            if (xmlStrcmp( keyID, BAD_CAST testKeyID ) != 0) {
+            if (!mpw_id_equals( &keyID, &testKeyID )) {
                 ++failedTests;
-                fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", testKeyID, keyID );
+                fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", testKeyID.hex, keyID.hex );
                 continue;
             }
 
@@ -165,7 +165,6 @@ int main(int argc, char *const argv[]) {
         xmlFree( id );
         xmlFree( fullName );
         xmlFree( masterPassword );
-        xmlFree( keyID );
         xmlFree( siteName );
         xmlFree( resultTypeString );
         xmlFree( keyPurposeString );
