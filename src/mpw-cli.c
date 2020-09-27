@@ -603,9 +603,15 @@ void cli_operation(Arguments *args, Operation *operation) {
         }
         case MPKeyPurposeIdentification: {
             operation->purposeResult = "login";
-            operation->resultType = operation->site->loginType;
-            operation->resultState = operation->site->loginState? mpw_strdup( operation->site->loginState ): NULL;
-            operation->siteCounter = MPCounterValueInitial;
+            if (operation->site->loginType != MPResultTypeNone) {
+                operation->resultType = operation->site->loginType;
+                operation->resultState = operation->site->loginState? mpw_strdup( operation->site->loginState ): NULL;
+                operation->siteCounter = MPCounterValueInitial;
+            } else {
+                operation->resultType = operation->user->loginType;
+                operation->resultState = operation->user->loginState? mpw_strdup( operation->user->loginState ): NULL;
+                operation->siteCounter = MPCounterValueInitial;
+            }
             break;
         }
         case MPKeyPurposeRecovery: {
