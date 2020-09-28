@@ -140,16 +140,16 @@ int main(int argc, char *const argv[]) {
                 continue;
             }
 
-            // 2. calculate the site password.
+            // 2. calculate the service password.
             const char *testResult = mpw_service_result(
                     masterKey, (char *)serviceName, resultType, NULL, keyCounter, keyPurpose, (char *)keyContext );
             mpw_free( &masterKey, sizeof( *masterKey ) );
             if (!testResult) {
-                ftl( "Couldn't derive site password." );
+                ftl( "Couldn't derive service password." );
                 continue;
             }
 
-            // Check the site result.
+            // Check the service result.
             if (xmlStrcmp( result, BAD_CAST testResult ) != 0) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (result: got %s != expected %s)\n", testResult, result );

@@ -730,7 +730,7 @@ void cli_fileRedacted(Arguments *args, Operation *operation) {
         operation->user->redacted = mpw_get_bool( args->fileRedacted );
 
     else if (!operation->user->redacted)
-        wrn( "Sites configuration is not redacted.  Use -R 1 to change this." );
+        wrn( "User configuration file is not redacted.  Use -R 1 to change this." );
 }
 
 void cli_mpw(Arguments *args, Operation *operation) {
