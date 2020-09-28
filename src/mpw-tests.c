@@ -133,10 +133,9 @@ int main(int argc, char *const argv[]) {
             }
 
             // Check the master key.
-            MPKeyID testKeyID = mpw_id_buf( masterKey->bytes, sizeof( masterKey->bytes ) );
-            if (!mpw_id_equals( &keyID, &testKeyID )) {
+            if (!mpw_id_equals( &keyID, &masterKey->keyID )) {
                 ++failedTests;
-                fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", testKeyID.hex, keyID.hex );
+                fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", masterKey->keyID.hex, keyID.hex );
                 continue;
             }
 

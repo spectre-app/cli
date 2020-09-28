@@ -751,10 +751,9 @@ void cli_mpw(Arguments *args, Operation *operation) {
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
-    MPKeyID keyID = mpw_id_buf( masterKey->bytes, sizeof( masterKey->bytes ) );
     if (!mpw_id_valid( &operation->user->keyID ))
-        operation->user->keyID = keyID;
-    else if (!mpw_id_equals( &keyID, &operation->user->keyID )) {
+        operation->user->keyID = masterKey->keyID;
+    else if (!mpw_id_equals( &masterKey->keyID, &operation->user->keyID )) {
         ftl( "Master key mismatch." );
         mpw_free( &masterKey, sizeof( *masterKey ) );
         cli_free( args, operation );
