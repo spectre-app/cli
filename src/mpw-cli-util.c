@@ -264,7 +264,7 @@ const char *mpw_read_fd(int fd) {
     char *buf = NULL;
     size_t blockSize = 4096, bufSize = 0, bufOffset = 0;
     ssize_t readSize = 0;
-    while ((mpw_realloc( &buf, &bufSize, bufSize + blockSize )) &&
+    while ((mpw_realloc( &buf, &bufSize, char, bufSize / sizeof( char ) + blockSize )) &&
            ((readSize = read( fd, buf + bufOffset, blockSize )) > 0));
     if (readSize == ERR)
         mpw_free( &buf, bufSize );
@@ -279,7 +279,7 @@ const char *mpw_read_file(FILE *file) {
 
     char *buf = NULL;
     size_t blockSize = 4096, bufSize = 0, bufOffset = 0, readSize = 0;
-    while ((mpw_realloc( &buf, &bufSize, bufSize + blockSize )) &&
+    while ((mpw_realloc( &buf, &bufSize, char, bufSize / sizeof( char ) + blockSize )) &&
            (bufOffset += (readSize = fread( buf + bufOffset, 1, blockSize, file ))) &&
            (readSize == blockSize));
     if (ferror( file ))
