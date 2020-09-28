@@ -106,9 +106,8 @@ mpw_expect 'ModoLalhRapo6#'         -Fnone \
     -u 'tesẗ' -M '⛄'   -tlong      -c1 -a3 -p 'authentication' -C ''          'ẗesẗ'
 mpw_expect 'CudmTecuPune7:'         -Fnone \
     -u 'tesẗ' -M 'ẗest' -tlong      -c1 -a3 -p 'authentication' -C ''          '⛄'
-# TODO: user-level login
-#mpw_expect 'yubfalago'              -Fnone \
-#    -u 'tesẗ' -M 'ẗest'                     -p 'identification' -C ''          'ẗesẗ'
+mpw_expect 'mebkovidu'              -Fnone \
+    -u 'tesẗ' -M 'ẗest'                     -p 'identification' -C ''          'ẗesẗ'
 mpw_expect 'yubfalago'              -Fnone \
     -u 'tesẗ' -M 'ẗest' -tname      -c1 -a3 -p 'identification' -C ''          'ẗesẗ'
 mpw_expect 'jip nodwoqude dizo'     -Fnone \
@@ -261,11 +260,10 @@ mpw_expect 'jupxiqepi'              -Fflat -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tname   -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.name'
 mpw_expect 'vuh buxtukewo puhe'     -Fflat -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tphrase -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.phrase'
-mpw_expect 'Cq5$TfH#OHmPS9yREp7)'    -Fflat -R0 \
+mpw_expect 'Cq5$TfH#OHmPS9yREp7)'   -Fflat -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tmax    -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi.max'
-# TODO: user-level login
-#mpw_expect 'mophabiwe'              -Fflat -R0 \
-#    -u 'tesẗ.v3' -M 'ẗest'          -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
+mpw_expect 'secgudiho'              -Fflat -R0 \
+    -u 'tesẗ.v3' -M 'ẗest'          -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'mophabiwe'              -Fflat -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tname   -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'lA^ul!%9&TD%fj6icT1['   -Fflat -R0 \
@@ -299,9 +297,8 @@ mpw_expect 'cez fexlemozo yula'     -Fflat -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tphrase -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.phrase'
 mpw_expect 'T8+xi4NMd3HUGdV#GW*%'   -Fflat -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tmax    -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi.max'
-# TODO: user-level login
-#mpw_expect 'camfibeye'              -Fflat -R0 \
-#    -u 'tesẗ.v2' -M 'ẗest'          -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
+mpw_expect 'xodxuwemu'              -Fflat -R0 \
+    -u 'tesẗ.v2' -M 'ẗest'          -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'camfibeye'              -Fflat -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tname   -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'YLcoWeBwyiBf2*irFq1.'   -Fflat -R0 \
@@ -335,9 +332,8 @@ mpw_expect 'sij jihloyenu kizi'     -Fflat -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tphrase -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.phrase'
 mpw_expect 'z2U9)(uQ78TXqtaus)8.'   -Fflat -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tmax    -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi.max'
-# TODO: user-level login
-#mpw_expect 'qipberize'              -Fflat -R0 \
-#    -u 'tesẗ.v1' -M 'ẗest'          -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
+mpw_expect 'vurperoto'              -Fflat -R0 \
+    -u 'tesẗ.v1' -M 'ẗest'          -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'qipberize'              -Fflat -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tname   -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'QMciaKyi1&I*g%tHz99,'   -Fflat -R0 \
@@ -371,9 +367,8 @@ mpw_expect 'xir qebdohogo buno'     -Fflat -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tphrase -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.phrase'
 mpw_expect "RoAm3bJSvo@#loHSRA6\'"  -Fflat -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tmax    -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi.max'
-# TODO: user-level login
-#mpw_expect 'ragcoxudo'              -Fflat -R0 \
-#    -u 'tesẗ.v0' -M 'ẗest'          -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
+mpw_expect 'nutlagika'              -Fflat -R0 \
+    -u 'tesẗ.v0' -M 'ẗest'          -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'ragcoxudo'              -Fflat -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tname   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'm8]SiJHiAS@H@Rbw))34'   -Fflat -R0 \
@@ -406,11 +401,10 @@ mpw_expect 'jupxiqepi'              -Fjson -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tname   -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.name'
 mpw_expect 'vuh buxtukewo puhe'     -Fjson -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tphrase -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.phrase'
-mpw_expect 'Cq5$TfH#OHmPS9yREp7)'    -Fjson -R0 \
+mpw_expect 'Cq5$TfH#OHmPS9yREp7)'   -Fjson -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tmax    -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi.max'
-# TODO: user-level login
-#mpw_expect 'mophabiwe'              -Fjson -R0 \
-#    -u 'tesẗ.v3' -M 'ẗest'          -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
+mpw_expect 'secgudiho'              -Fjson -R0 \
+    -u 'tesẗ.v3' -M 'ẗest'          -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'mophabiwe'              -Fjson -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tname   -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'lA^ul!%9&TD%fj6icT1['   -Fjson -R0 \
@@ -444,9 +438,8 @@ mpw_expect 'cez fexlemozo yula'     -Fjson -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tphrase -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.phrase'
 mpw_expect 'T8+xi4NMd3HUGdV#GW*%'   -Fjson -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tmax    -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi.max'
-# TODO: user-level login
-#mpw_expect 'camfibeye'              -Fjson -R0 \
-#    -u 'tesẗ.v2' -M 'ẗest'          -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
+mpw_expect 'xodxuwemu'              -Fjson -R0 \
+    -u 'tesẗ.v2' -M 'ẗest'          -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'camfibeye'              -Fjson -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tname   -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'YLcoWeBwyiBf2*irFq1.'   -Fjson -R0 \
@@ -480,9 +473,8 @@ mpw_expect 'sij jihloyenu kizi'     -Fjson -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tphrase -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.phrase'
 mpw_expect 'z2U9)(uQ78TXqtaus)8.'   -Fjson -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tmax    -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi.max'
-# TODO: user-level login
-#mpw_expect 'qipberize'              -Fjson -R0 \
-#    -u 'tesẗ.v1' -M 'ẗest'          -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
+mpw_expect 'vurperoto'              -Fjson -R0 \
+    -u 'tesẗ.v1' -M 'ẗest'          -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'qipberize'              -Fjson -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tname   -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'QMciaKyi1&I*g%tHz99,'   -Fjson -R0 \
@@ -516,11 +508,10 @@ mpw_expect 'xir qebdohogo buno'     -Fjson -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tphrase -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.phrase'
 mpw_expect "RoAm3bJSvo@#loHSRA6\'"  -Fjson -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tmax    -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi.max'
-# TODO: user-level login
-#mpw_expect 'ragcoxudo'              -Fjson -R0 \
-#    -u 'tesẗ.v0' -M 'ẗest'          -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
+mpw_expect 'nutlagika'              -Fjson -R0 \
+    -u 'tesẗ.v0' -M 'ẗest'          -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'ragcoxudo'              -Fjson -R0 \
-    -u 'tesẗ.v0' -M 'ẗest' -tname    -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
+    -u 'tesẗ.v0' -M 'ẗest' -tname   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'm8]SiJHiAS@H@Rbw))34'   -Fjson -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tmax    -c1 -a0 -p 'recovery'       -C ''          'ẗesẗ.c1a0pr.max'
 mpw_expect 'kokl hov lowmaya xaf'   -Fjson -R0 \

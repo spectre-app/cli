@@ -5,9 +5,9 @@
         <fullName>Robert Lee Mitchell</fullName>
         <masterPassword>banana colored duckling</masterPassword>
         <keyID>98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302</keyID>
-        <siteName>masterpasswordapp.com</siteName>
-        <siteCounter>1</siteCounter>
+        <serviceName>masterpasswordapp.com</serviceName>
         <resultType>Long</resultType>
+        <keyCounter>1</keyCounter>
         <keyPurpose>Authentication</keyPurpose>
         <result><!-- abstract --></result>
     </case>
@@ -27,8 +27,8 @@
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>QesuHirv5-Xepl</result>
     </case>
-    <case id="v3_mb_siteName" parent="v3">
-        <siteName>⛄</siteName>
+    <case id="v3_mb_serviceName" parent="v3">
+        <serviceName>⛄</serviceName>
         <result>LiheCuwhSerz6)</result>
     </case>
     <case id="v3_loginName" parent="v3">
@@ -74,7 +74,7 @@
         <result>jejr quv cabsibu tam</result>
     </case>
     <case id="v3_counter_ceiling" parent="v3">
-        <siteCounter>4294967295</siteCounter>
+        <keyCounter>4294967295</keyCounter>
         <result>XambHoqo6[Peni</result>
     </case>
 
@@ -93,8 +93,8 @@
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>QesuHirv5-Xepl</result>
     </case>
-    <case id="v2_mb_siteName" parent="v2">
-        <siteName>⛄</siteName>
+    <case id="v2_mb_serviceName" parent="v2">
+        <serviceName>⛄</serviceName>
         <result>LiheCuwhSerz6)</result>
     </case>
     <case id="v2_loginName" parent="v2">
@@ -140,7 +140,7 @@
         <result>jejr quv cabsibu tam</result>
     </case>
     <case id="v2_counter_ceiling" parent="v2">
-        <siteCounter>4294967295</siteCounter>
+        <keyCounter>4294967295</keyCounter>
         <result>XambHoqo6[Peni</result>
     </case>
 
@@ -159,8 +159,8 @@
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>QesuHirv5-Xepl</result>
     </case>
-    <case id="v1_mb_siteName" parent="v1">
-        <siteName>⛄</siteName>
+    <case id="v1_mb_serviceName" parent="v1">
+        <serviceName>⛄</serviceName>
         <result>WawiYarp2@Kodh</result>
     </case>
     <case id="v1_loginName" parent="v1">
@@ -206,7 +206,7 @@
         <result>jejr quv cabsibu tam</result>
     </case>
     <case id="v1_counter_ceiling" parent="v1">
-        <siteCounter>4294967295</siteCounter>
+        <keyCounter>4294967295</keyCounter>
         <result>XambHoqo6[Peni</result>
     </case>
 
@@ -225,8 +225,8 @@
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>MewmDini0]Meho</result>
     </case>
-    <case id="v0_mb_siteName" parent="v0">
-        <siteName>⛄</siteName>
+    <case id="v0_mb_serviceName" parent="v0">
+        <serviceName>⛄</serviceName>
         <result>HahiVana2@Nole</result>
     </case>
     <case id="v0_loginName" parent="v0">
@@ -272,7 +272,7 @@
         <result>fejr jug gabsibu bax</result>
     </case>
     <case id="v0_counter_ceiling" parent="v0">
-        <siteCounter>4294967295</siteCounter>
+        <keyCounter>4294967295</keyCounter>
         <result>QateDojh1@Hecn</result>
     </case>
 </tests>

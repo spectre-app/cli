@@ -42,7 +42,7 @@
 
 static void mpw_time(struct timeval *time) {
 
-    if (gettimeofday( time, NULL ) != 0)
+    if (gettimeofday( time, NULL ) != OK)
         ftl( "Could not get time: %s", strerror( errno ) );
 }
 
@@ -66,28 +66,28 @@ int main(int argc, char *const argv[]) {
 
     const char *fullName = "Robert Lee Mitchel";
     const char *masterPassword = "banana colored duckling";
-    const char *siteName = "masterpassword.app";
-    const MPCounterValue siteCounter = MPCounterValueDefault;
+    const char *serviceName = "masterpassword.app";
     const MPResultType resultType = MPResultTypeDefaultResult;
+    const MPCounterValue keyCounter = MPCounterValueDefault;
     const MPKeyPurpose keyPurpose = MPKeyPurposeAuthentication;
     const char *keyContext = NULL;
     struct timeval startTime;
     unsigned int iterations;
     float percent;
-    const MPMasterKey *masterKey;
 
     // Start HMAC-SHA-256
     // Similar to phase-two of mpw
-    uint8_t *sitePasswordInfo = malloc( 128 );
+    uint8_t *servicePasswordInfo = malloc( 128 );
     iterations = 4200000; /* tuned to ~10s on dev machine */
-    masterKey = mpw_master_key( fullName, masterPassword, MPAlgorithmVersionCurrent );
+    const MPMasterKey *masterKey = mpw_master_key( fullName, masterPassword, MPAlgorithmVersionCurrent );
     if (!masterKey) {
         ftl( "Could not allocate master key: %s", strerror( errno ) );
         abort();
     }
     mpw_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
-        free( (void *)mpw_hash_hmac_sha256( masterKey, sizeof( *masterKey ), sitePasswordInfo, 128 ) );
+        uint8_t mac[32];
+        mpw_hash_hmac_sha256( mac, masterKey->bytes, sizeof( masterKey->bytes ), servicePasswordInfo, 128 );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rhmac-sha-256: iteration %d / %d (%.0f%%)..", i, iterations, percent );
@@ -131,8 +131,8 @@ int main(int argc, char *const argv[]) {
             break;
         }
 
-        free( (void *)mpw_site_result(
-                masterKey, siteName, siteCounter, keyPurpose, keyContext, resultType, NULL, MPAlgorithmVersionCurrent ) );
+        free( (void *)mpw_service_result(
+                masterKey, serviceName, resultType, NULL, keyCounter, keyPurpose, keyContext ) );
         free( (void *)masterKey );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)

@@ -97,8 +97,8 @@ int main(int argc, char *const argv[]) {
         xmlChar *fullName = mpw_xmlTestCaseString( testCase, "fullName" );
         xmlChar *masterPassword = mpw_xmlTestCaseString( testCase, "masterPassword" );
         MPKeyID keyID = mpw_id_str( (char *)mpw_xmlTestCaseString( testCase, "keyID" ) );
-        xmlChar *siteName = mpw_xmlTestCaseString( testCase, "siteName" );
-        MPCounterValue siteCounter = (MPCounterValue)mpw_xmlTestCaseInteger( testCase, "siteCounter" );
+        xmlChar *serviceName = mpw_xmlTestCaseString( testCase, "serviceName" );
+        MPCounterValue keyCounter = (MPCounterValue)mpw_xmlTestCaseInteger( testCase, "keyCounter" );
         xmlChar *resultTypeString = mpw_xmlTestCaseString( testCase, "resultType" );
         xmlChar *keyPurposeString = mpw_xmlTestCaseString( testCase, "keyPurpose" );
         xmlChar *keyContext = mpw_xmlTestCaseString( testCase, "keyContext" );
@@ -133,7 +133,7 @@ int main(int argc, char *const argv[]) {
             }
 
             // Check the master key.
-            MPKeyID testKeyID = mpw_id_buf( masterKey, sizeof( *masterKey ) );
+            MPKeyID testKeyID = mpw_id_buf( masterKey->bytes, sizeof( masterKey->bytes ) );
             if (!mpw_id_equals( &keyID, &testKeyID )) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", testKeyID.hex, keyID.hex );
@@ -141,8 +141,8 @@ int main(int argc, char *const argv[]) {
             }
 
             // 2. calculate the site password.
-            const char *testResult = mpw_site_result(
-                    masterKey, (char *)siteName, siteCounter, keyPurpose, (char *)keyContext, resultType, NULL, algorithm );
+            const char *testResult = mpw_service_result(
+                    masterKey, (char *)serviceName, resultType, NULL, keyCounter, keyPurpose, (char *)keyContext );
             mpw_free( &masterKey, sizeof( *masterKey ) );
             if (!testResult) {
                 ftl( "Couldn't derive site password." );
@@ -165,7 +165,7 @@ int main(int argc, char *const argv[]) {
         xmlFree( id );
         xmlFree( fullName );
         xmlFree( masterPassword );
-        xmlFree( siteName );
+        xmlFree( serviceName );
         xmlFree( resultTypeString );
         xmlFree( keyPurposeString );
         xmlFree( keyContext );

@@ -42,7 +42,7 @@ static void usage() {
          "\nUSAGE\n\n"
          "  mpw [-u|-U full-name] [-m fd] [-t pw-type] [-P value] [-c counter]\n"
          "      [-a version] [-p purpose] [-C context] [-f|F format] [-R 0|1]\n"
-         "      [-v|-q]* [-h] [site-name]\n" );
+         "      [-v|-q]* [-h] [service-name]\n" );
     inf( ""
          "  -u full-name Specify the full name of the user.\n"
          "               -u checks the master password against the config,\n"
@@ -70,7 +70,7 @@ static void usage() {
          "                   P, personal | saved personal password (save with -P pw).\n" );
     inf( ""
          "  -P value     The parameter value.\n"
-         "                   -p i        | The login name for the site.\n"
+         "                   -p i        | The login name for the service.\n"
          "                   -t K        | The bit size of the key to generate (eg. 256).\n"
          "                   -t P        | The personal password to encrypt.\n" );
     inf( ""
@@ -103,7 +103,7 @@ static void usage() {
             mpw_format_name( MPMarshalFormatDefault ), MP_ENV_format, mpw_format_name( MPMarshalFormatDefault ),
             mpw_format_extension( MPMarshalFormatFlat ), mpw_format_extension( MPMarshalFormatJSON ) );
     inf( ""
-         "  -R redacted  Whether to save the mpsites in redacted format or not.\n"
+         "  -R redacted  Whether to save the file in redacted format or not.\n"
          "               Redaction omits or encrypts any secrets, making the file safe\n"
          "               for saving on or transmitting via untrusted media.\n"
          "               Defaults to 1, redacted.\n" );
@@ -113,12 +113,12 @@ static void usage() {
     inf( ""
          "  -h           Show this help output instead of performing any operation.\n" );
     inf( ""
-         "  site-name    Name of the site for which to generate a token.\n" );
+         "  service-name Name of the service for which to generate a token.\n" );
     inf( ""
          "\nENVIRONMENT\n\n"
          "  %-12s The full name of the user (see -u).\n"
          "  %-12s The default algorithm version (see -a).\n"
-         "  %-12s The default mpsites format (see -f).\n"
+         "  %-12s The default file format (see -f).\n"
          "  %-12s The askpass program to use for prompting the user.\n",
             MP_ENV_fullName, MP_ENV_algorithm, MP_ENV_format, MP_ENV_askpass );
     exit( EX_OK );
@@ -130,36 +130,36 @@ typedef struct {
     const char *fullName;
     const char *masterPasswordFD;
     const char *masterPassword;
-    const char *siteName;
+    const char *serviceName;
     const char *resultType;
     const char *resultParam;
-    const char *siteCounter;
-    const char *algorithmVersion;
+    const char *keyCounter;
     const char *keyPurpose;
     const char *keyContext;
-    const char *sitesFormat;
-    const char *sitesRedacted;
+    const char *algorithmVersion;
+    const char *fileFormat;
+    const char *fileRedacted;
 } Arguments;
 
 typedef struct {
     bool allowPasswordUpdate;
-    bool sitesFormatFixed;
+    bool fileFormatFixed;
+    MPMarshalFormat fileFormat;
+    const char *filePath;
     const char *fullName;
     const char *masterPassword;
     const char *identicon;
-    const char *siteName;
-    MPMarshalFormat sitesFormat;
-    MPKeyPurpose keyPurpose;
-    const char *keyContext;
-    const char *sitesPath;
+    const char *serviceName;
     MPResultType resultType;
-    MPCounterValue siteCounter;
-    const char *purposeResult;
     const char *resultState;
     const char *resultParam;
+    const char *resultPurpose;
+    MPCounterValue keyCounter;
+    MPKeyPurpose keyPurpose;
+    const char *keyContext;
     MPMarshalledFile *file;
     MPMarshalledUser *user;
-    MPMarshalledSite *site;
+    MPMarshalledService *service;
     MPMarshalledQuestion *question;
 } Operation;
 
@@ -169,19 +169,19 @@ void cli_free(Arguments *args, Operation *operation);
 void cli_args(Arguments *args, Operation *operation, const int argc, char *const argv[]);
 void cli_fullName(Arguments *args, Operation *operation);
 void cli_masterPassword(Arguments *args, Operation *operation);
-void cli_siteName(Arguments *args, Operation *operation);
-void cli_sitesFormat(Arguments *args, Operation *operation);
+void cli_serviceName(Arguments *args, Operation *operation);
+void cli_fileFormat(Arguments *args, Operation *operation);
+void cli_keyCounter(Arguments *args, Operation *operation);
 void cli_keyPurpose(Arguments *args, Operation *operation);
 void cli_keyContext(Arguments *args, Operation *operation);
 void cli_user(Arguments *args, Operation *operation);
-void cli_site(Arguments *args, Operation *operation);
+void cli_service(Arguments *args, Operation *operation);
 void cli_question(Arguments *args, Operation *operation);
-void cli_operation(Arguments *args, Operation *operation);
 void cli_resultType(Arguments *args, Operation *operation);
-void cli_siteCounter(Arguments *args, Operation *operation);
+void cli_resultState(Arguments *args, Operation *operation);
 void cli_resultParam(Arguments *args, Operation *operation);
 void cli_algorithmVersion(Arguments *args, Operation *operation);
-void cli_sitesRedacted(Arguments *args, Operation *operation);
+void cli_fileRedacted(Arguments *args, Operation *operation);
 void cli_mpw(Arguments *args, Operation *operation);
 void cli_save(Arguments *args, Operation *operation);
 
@@ -195,40 +195,40 @@ int main(const int argc, char *const argv[]) {
     Arguments args = {
             .fullName = mpw_getenv( MP_ENV_fullName ),
             .algorithmVersion = mpw_getenv( MP_ENV_algorithm ),
-            .sitesFormat = mpw_getenv( MP_ENV_format ),
+            .fileFormat = mpw_getenv( MP_ENV_format ),
     };
     Operation operation = {
             .allowPasswordUpdate = false,
-            .sitesFormatFixed = false,
-            .sitesFormat = MPMarshalFormatDefault,
-            .keyPurpose = MPKeyPurposeAuthentication,
+            .fileFormatFixed = false,
+            .fileFormat = MPMarshalFormatDefault,
             .resultType = MPResultTypeDefaultResult,
-            .siteCounter = MPCounterValueDefault,
+            .keyCounter = MPCounterValueDefault,
+            .keyPurpose = MPKeyPurposeAuthentication,
     };
 
     // Read the command-line options.
     cli_args( &args, &operation, argc, argv );
 
-    // Determine the operation parameters not sourced from mpsites.
+    // Determine the operation parameters not sourced from the user's file.
     cli_fullName( &args, &operation );
     cli_masterPassword( &args, &operation );
-    cli_siteName( &args, &operation );
-    cli_sitesFormat( &args, &operation );
+    cli_serviceName( &args, &operation );
+    cli_fileFormat( &args, &operation );
     cli_keyPurpose( &args, &operation );
     cli_keyContext( &args, &operation );
 
-    // Load the operation parameters from mpsites.
+    // Load the operation parameters present in the user's file.
     cli_user( &args, &operation );
-    cli_site( &args, &operation );
+    cli_service( &args, &operation );
     cli_question( &args, &operation );
-    cli_operation( &args, &operation );
 
     // Override the operation parameters from command-line arguments.
     cli_resultType( &args, &operation );
-    cli_siteCounter( &args, &operation );
+    cli_resultState( &args, &operation );
     cli_resultParam( &args, &operation );
+    cli_keyCounter( &args, &operation );
     cli_algorithmVersion( &args, &operation );
-    cli_sitesRedacted( &args, &operation );
+    cli_fileRedacted( &args, &operation );
     cli_free( &args, NULL );
 
     // Operation summary.
@@ -236,17 +236,17 @@ int main(const int argc, char *const argv[]) {
     if (operation.file && operation.user) {
         dbg( "fullName         : %s", operation.user->fullName );
         dbg( "identicon        : %s", operation.identicon );
-        dbg( "sitesFormat      : %s%s", mpw_format_name( operation.sitesFormat ), operation.sitesFormatFixed? " (fixed)": "" );
-        dbg( "sitesPath        : %s", operation.sitesPath );
+        dbg( "fileFormat       : %s%s", mpw_format_name( operation.fileFormat ), operation.fileFormatFixed? " (fixed)": "" );
+        dbg( "filePath         : %s", operation.filePath );
     }
-    if (operation.site) {
-        dbg( "siteName         : %s", operation.site->siteName );
-        dbg( "siteCounter      : %u", operation.siteCounter );
+    if (operation.service) {
+        dbg( "serviceName      : %s", operation.serviceName );
         dbg( "resultType       : %s (%u)", mpw_type_short_name( operation.resultType ), operation.resultType );
         dbg( "resultParam      : %s", operation.resultParam );
+        dbg( "keyCounter       : %u", operation.keyCounter );
         dbg( "keyPurpose       : %s (%u)", mpw_purpose_name( operation.keyPurpose ), operation.keyPurpose );
         dbg( "keyContext       : %s", operation.keyContext );
-        dbg( "algorithmVersion : %u", operation.site->algorithm );
+        dbg( "algorithmVersion : %u", operation.service->algorithm );
     }
     dbg( "-----------------" );
 
@@ -263,18 +263,18 @@ int main(const int argc, char *const argv[]) {
 void cli_free(Arguments *args, Operation *operation) {
 
     if (args) {
-        mpw_free_strings( &args->fullName, &args->masterPasswordFD, &args->masterPassword, &args->siteName, NULL );
-        mpw_free_strings( &args->resultType, &args->resultParam, &args->siteCounter, &args->algorithmVersion, NULL );
-        mpw_free_strings( &args->keyPurpose, &args->keyContext, &args->sitesFormat, &args->sitesRedacted, NULL );
+        mpw_free_strings( &args->fullName, &args->masterPasswordFD, &args->masterPassword, &args->serviceName, NULL );
+        mpw_free_strings( &args->resultType, &args->resultParam, &args->keyCounter, &args->algorithmVersion, NULL );
+        mpw_free_strings( &args->keyPurpose, &args->keyContext, &args->fileFormat, &args->fileRedacted, NULL );
     }
 
     if (operation) {
-        mpw_free_strings( &operation->fullName, &operation->masterPassword, &operation->siteName, NULL );
+        mpw_free_strings( &operation->fullName, &operation->masterPassword, &operation->serviceName, NULL );
         mpw_free_strings( &operation->keyContext, &operation->resultState, &operation->resultParam, NULL );
-        mpw_free_strings( &operation->identicon, &operation->sitesPath, NULL );
+        mpw_free_strings( &operation->identicon, &operation->filePath, NULL );
         mpw_marshal_file_free( &operation->file );
         mpw_marshal_user_free( &operation->user );
-        operation->site = NULL;
+        operation->service = NULL;
         operation->question = NULL;
         mpw_masterKeyProvider_free();
     }
@@ -307,7 +307,7 @@ void cli_args(Arguments *args, Operation *operation, const int argc, char *const
                 args->resultParam = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
                 break;
             case 'c':
-                args->siteCounter = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->keyCounter = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
                 break;
             case 'a':
                 args->algorithmVersion = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
@@ -319,15 +319,15 @@ void cli_args(Arguments *args, Operation *operation, const int argc, char *const
                 args->keyContext = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
                 break;
             case 'f':
-                args->sitesFormat = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
-                operation->sitesFormatFixed = false;
+                args->fileFormat = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                operation->fileFormatFixed = false;
                 break;
             case 'F':
-                args->sitesFormat = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
-                operation->sitesFormatFixed = true;
+                args->fileFormat = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                operation->fileFormatFixed = true;
                 break;
             case 'R':
-                args->sitesRedacted = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->fileRedacted = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
                 break;
             case 'v':
                 ++mpw_verbosity;
@@ -359,7 +359,7 @@ void cli_args(Arguments *args, Operation *operation, const int argc, char *const
         }
 
     if (optind < argc && argv[optind])
-        args->siteName = mpw_strdup( argv[optind] );
+        args->serviceName = mpw_strdup( argv[optind] );
 }
 
 void cli_fullName(Arguments *args, Operation *operation) {
@@ -406,30 +406,30 @@ void cli_masterPassword(Arguments *args, Operation *operation) {
     }
 }
 
-void cli_siteName(Arguments *args, Operation *operation) {
+void cli_serviceName(Arguments *args, Operation *operation) {
 
-    mpw_free_string( &operation->siteName );
+    mpw_free_string( &operation->serviceName );
 
-    if (args->siteName)
-        operation->siteName = mpw_strdup( args->siteName );
-    if (!operation->siteName)
-        operation->siteName = mpw_getline( "Site name:" );
+    if (args->serviceName)
+        operation->serviceName = mpw_strdup( args->serviceName );
+    if (!operation->serviceName)
+        operation->serviceName = mpw_getline( "Service name:" );
 
-    if (!operation->siteName) {
-        ftl( "Missing site name." );
+    if (!operation->serviceName) {
+        ftl( "Missing service name." );
         cli_free( args, operation );
         exit( EX_DATAERR );
     }
 }
 
-void cli_sitesFormat(Arguments *args, Operation *operation) {
+void cli_fileFormat(Arguments *args, Operation *operation) {
 
-    if (!args->sitesFormat)
+    if (!args->fileFormat)
         return;
 
-    operation->sitesFormat = mpw_format_named( args->sitesFormat );
-    if (ERR == (int)operation->sitesFormat) {
-        ftl( "Invalid sites format: %s", args->sitesFormat );
+    operation->fileFormat = mpw_format_named( args->fileFormat );
+    if (ERR == (int)operation->fileFormat) {
+        ftl( "Invalid file format: %s", args->fileFormat );
         cli_free( args, operation );
         exit( EX_DATAERR );
     }
@@ -457,32 +457,33 @@ void cli_keyContext(Arguments *args, Operation *operation) {
 }
 
 static FILE *cli_user_open(const MPMarshalFormat format, Operation *operation) {
-    FILE *sitesFile = NULL;
+
+    FILE *userFile = NULL;
     size_t count = 0;
     const char **extensions = mpw_format_extensions( format, &count );
-    for (int e = 0; !sitesFile && e < count; ++e) {
-        mpw_free_string( &operation->sitesPath );
-        operation->sitesPath = mpw_path( operation->fullName, extensions[e] );
+    for (int e = 0; !userFile && e < count; ++e) {
+        mpw_free_string( &operation->filePath );
+        operation->filePath = mpw_path( operation->fullName, extensions[e] );
 
-        if (!operation->sitesPath || !(sitesFile = fopen( operation->sitesPath, "r" )))
-            dbg( "Couldn't open configuration file:\n  %s: %s", operation->sitesPath, strerror( errno ) );
+        if (!operation->filePath || !(userFile = fopen( operation->filePath, "r" )))
+            dbg( "Couldn't open configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
     }
     mpw_free( &extensions, count * sizeof( *extensions ) );
 
-    return sitesFile;
+    return userFile;
 }
 
 void cli_user(Arguments *args, Operation *operation) {
 
-    // Find mpsites file from parameters.
-    FILE *sitesFile = cli_user_open( operation->sitesFormat, operation );
-    if (!sitesFile && !operation->sitesFormatFixed)
-        for (MPMarshalFormat format = MPMarshalFormatLast; !sitesFile && format >= MPMarshalFormatFirst; --format)
-            sitesFile = cli_user_open( format, operation );
+    // Find the user's file from parameters.
+    FILE *userFile = cli_user_open( operation->fileFormat, operation );
+    if (!userFile && !operation->fileFormatFixed)
+        for (MPMarshalFormat format = MPMarshalFormatLast; !userFile && format >= MPMarshalFormatFirst; --format)
+            userFile = cli_user_open( format, operation );
 
-    if (!sitesFile) {
-        // If no user from mpsites, create a new one.
-        mpw_free_string( &operation->sitesPath );
+    if (!userFile) {
+        // If no user from the user's file, create a new one.
+        mpw_free_string( &operation->filePath );
         mpw_marshal_file_free( &operation->file );
         mpw_marshal_user_free( &operation->user );
         operation->file = mpw_marshal_file( NULL, NULL, NULL );
@@ -490,21 +491,21 @@ void cli_user(Arguments *args, Operation *operation) {
     }
 
     else {
-        // Load the user object from mpsites.
-        const char *sitesInputData = mpw_read_file( sitesFile );
-        if (!sitesInputData || ferror( sitesFile ))
-            wrn( "Error while reading configuration file:\n  %s: %d", operation->sitesPath, ferror( sitesFile ) );
-        fclose( sitesFile );
+        // Load the user object from the user's file.
+        const char *fileInputData = mpw_read_file( userFile );
+        if (!fileInputData || ferror( userFile ))
+            wrn( "Error while reading configuration file:\n  %s: %d", operation->filePath, ferror( userFile ) );
+        fclose( userFile );
 
         // Parse file.
         mpw_marshal_file_free( &operation->file );
         mpw_marshal_user_free( &operation->user );
-        operation->file = mpw_marshal_read( NULL, sitesInputData );
+        operation->file = mpw_marshal_read( NULL, fileInputData );
         if (operation->file && operation->file->error.type == MPMarshalSuccess) {
             operation->user = mpw_marshal_auth( operation->file, cli_masterKeyProvider_op( operation ) );
 
             if (operation->file->error.type == MPMarshalErrorMasterPassword && operation->allowPasswordUpdate) {
-                // Update master password in mpsites.
+                // Update master password in the user's file.
                 while (operation->file->error.type == MPMarshalErrorMasterPassword) {
                     inf( "Given master password does not match configuration." );
                     inf( "To update the configuration with this new master password, first confirm the old master password." );
@@ -523,115 +524,97 @@ void cli_user(Arguments *args, Operation *operation) {
                 }
             }
         }
-        mpw_free_string( &sitesInputData );
+        mpw_free_string( &fileInputData );
 
         // Incorrect master password.
         if (operation->file->error.type == MPMarshalErrorMasterPassword) {
-            ftl( "Incorrect master password according to configuration:\n  %s: %s", operation->sitesPath, operation->file->error.message );
+            ftl( "Incorrect master password according to configuration:\n  %s: %s", operation->filePath, operation->file->error.message );
             cli_free( args, operation );
             exit( EX_DATAERR );
         }
 
         // Any other parse error.
         if (!operation->file || !operation->user || operation->file->error.type != MPMarshalSuccess) {
-            err( "Couldn't parse configuration file:\n  %s: %s", operation->sitesPath, operation->file->error.message );
+            err( "Couldn't parse configuration file:\n  %s: %s", operation->filePath, operation->file->error.message );
             cli_free( args, operation );
             exit( EX_DATAERR );
         }
     }
+
+    if (operation->masterPassword)
+        operation->user->identicon = mpw_identicon( operation->user->fullName, operation->masterPassword );
+    mpw_free_string( &operation->identicon );
+    operation->identicon = mpw_identicon_render( operation->user->identicon );
 }
 
-void cli_site(Arguments *args, Operation *operation) {
+void cli_service(Arguments *args, Operation *operation) {
 
-    if (!operation->siteName)
+    if (!operation->serviceName)
         abort();
 
-    // Load the site object from mpsites.
+    // Load the service object from the user's file.
     MPMarshalledUser *user = operation->user;
-    for (size_t s = 0; !operation->site && s < user->sites_count; ++s)
-        if (strcmp( operation->siteName, (&user->sites[s])->siteName ) == OK)
-            operation->site = &user->sites[s];
+    for (size_t s = 0; !operation->service && s < user->services_count; ++s)
+        if (strcmp( operation->serviceName, (&user->services[s])->serviceName ) == OK)
+            operation->service = &user->services[s];
 
-    // If no site from mpsites, create a new one.
-    if (!operation->site)
-        operation->site = mpw_marshal_site(
-                user, operation->siteName, user->defaultType, MPCounterValueDefault, user->algorithm );
+    // If no service from the user's file, create a new one.
+    if (!operation->service)
+        operation->service = mpw_marshal_service(
+                user, operation->serviceName, user->defaultType, MPCounterValueDefault, user->algorithm );
 }
 
 void cli_question(Arguments *args, Operation *operation) {
 
-    if (!operation->site)
+    if (!operation->service)
         abort();
 
-    // Load the question object from mpsites.
+    // Load the question object from the user's file.
     switch (operation->keyPurpose) {
         case MPKeyPurposeAuthentication:
         case MPKeyPurposeIdentification:
             break;
         case MPKeyPurposeRecovery:
-            for (size_t q = 0; !operation->question && q < operation->site->questions_count; ++q)
-                if (operation->keyContext == (&operation->site->questions[q])->keyword ||
-                    (!operation->keyContext && !strlen( (&operation->site->questions[q])->keyword )) ||
-                    (!(&operation->site->questions[q])->keyword && !strlen( operation->keyContext )) ||
-                    ((operation->keyContext && (&operation->site->questions[q])->keyword) &&
-                     strcmp( (&operation->site->questions[q])->keyword, operation->keyContext ) == OK))
-                    operation->question = &operation->site->questions[q];
+            for (size_t q = 0; !operation->question && q < operation->service->questions_count; ++q)
+                if (operation->keyContext == (&operation->service->questions[q])->keyword ||
+                    (!operation->keyContext && !strlen( (&operation->service->questions[q])->keyword )) ||
+                    (!(&operation->service->questions[q])->keyword && !strlen( operation->keyContext )) ||
+                    ((operation->keyContext && (&operation->service->questions[q])->keyword) &&
+                     strcmp( (&operation->service->questions[q])->keyword, operation->keyContext ) == OK))
+                    operation->question = &operation->service->questions[q];
 
-            // If no question from mpsites, create a new one.
+            // If no question from the user's file, create a new one.
             if (!operation->question)
-                operation->question = mpw_marshal_question( operation->site, operation->keyContext );
+                operation->question = mpw_marshal_question( operation->service, operation->keyContext );
             break;
-    }
-}
-
-void cli_operation(Arguments *args, Operation *operation) {
-
-    mpw_free_string( &operation->identicon );
-    operation->user->identicon = mpw_identicon( operation->user->fullName, operation->masterPassword );
-    operation->identicon = mpw_identicon_render( operation->user->identicon );
-
-    if (!operation->site)
-        abort();
-
-    switch (operation->keyPurpose) {
-        case MPKeyPurposeAuthentication: {
-            operation->purposeResult = "password";
-            operation->siteCounter = operation->site->counter;
-            operation->resultType = operation->site->resultType;
-            operation->resultState = operation->site->resultState? mpw_strdup( operation->site->resultState ): NULL;
-            break;
-        }
-        case MPKeyPurposeIdentification: {
-            operation->purposeResult = "login";
-            if (operation->site->loginType != MPResultTypeNone) {
-                operation->resultType = operation->site->loginType;
-                operation->resultState = operation->site->loginState? mpw_strdup( operation->site->loginState ): NULL;
-                operation->siteCounter = MPCounterValueInitial;
-            } else {
-                operation->resultType = operation->user->loginType;
-                operation->resultState = operation->user->loginState? mpw_strdup( operation->user->loginState ): NULL;
-                operation->siteCounter = MPCounterValueInitial;
-            }
-            break;
-        }
-        case MPKeyPurposeRecovery: {
-            mpw_free_string( &operation->keyContext );
-            operation->purposeResult = "answer";
-            operation->keyContext = operation->question->keyword? mpw_strdup( operation->question->keyword ): NULL;
-            operation->resultType = operation->question->type;
-            operation->resultState = operation->question->state? mpw_strdup( operation->question->state ): NULL;
-            operation->siteCounter = MPCounterValueInitial;
-            break;
-        }
     }
 }
 
 void cli_resultType(Arguments *args, Operation *operation) {
 
+    if (!operation->service)
+        abort();
+
+    switch (operation->keyPurpose) {
+        case MPKeyPurposeAuthentication: {
+            operation->resultPurpose = "password";
+            operation->resultType = operation->service->resultType;
+            break;
+        }
+        case MPKeyPurposeIdentification: {
+            operation->resultPurpose = "login";
+            operation->resultType = operation->service->loginType;
+            break;
+        }
+        case MPKeyPurposeRecovery: {
+            operation->resultPurpose = "answer";
+            operation->resultType = operation->question->type;
+            break;
+        }
+    }
+
     if (!args->resultType)
         return;
-    if (!operation->site)
-        abort();
 
     operation->resultType = mpw_type_named( args->resultType );
     if (ERR == (int)operation->resultType) {
@@ -640,13 +623,13 @@ void cli_resultType(Arguments *args, Operation *operation) {
         exit( EX_USAGE );
     }
 
-    if (!(operation->resultType & MPSiteFeatureAlternative)) {
+    if (!(operation->resultType & MPServiceFeatureAlternative)) {
         switch (operation->keyPurpose) {
             case MPKeyPurposeAuthentication:
-                operation->site->resultType = operation->resultType;
+                operation->service->resultType = operation->resultType;
                 break;
             case MPKeyPurposeIdentification:
-                operation->site->loginType = operation->resultType;
+                operation->service->loginType = operation->resultType;
                 break;
             case MPKeyPurposeRecovery:
                 operation->question->type = operation->resultType;
@@ -655,23 +638,59 @@ void cli_resultType(Arguments *args, Operation *operation) {
     }
 }
 
-void cli_siteCounter(Arguments *args, Operation *operation) {
+void cli_resultState(Arguments *args, Operation *operation) {
 
-    if (!args->siteCounter)
-        return;
-    if (!operation->site)
+    if (!operation->service)
         abort();
 
-    long long int siteCounterInt = strtoll( args->siteCounter, NULL, 0 );
-    if (siteCounterInt < MPCounterValueFirst || siteCounterInt > MPCounterValueLast) {
-        ftl( "Invalid site counter: %s", args->siteCounter );
+    switch (operation->keyPurpose) {
+        case MPKeyPurposeAuthentication: {
+            operation->resultState = operation->service->resultState? mpw_strdup( operation->service->resultState ): NULL;
+            operation->keyCounter = operation->service->counter;
+            break;
+        }
+        case MPKeyPurposeIdentification: {
+            if (operation->resultType != MPResultTypeNone) {
+                operation->resultState = operation->service->loginState? mpw_strdup( operation->service->loginState ): NULL;
+                operation->keyCounter = MPCounterValueInitial;
+            }
+            else {
+                // Identification at service-level is none, fall back to user-level.
+                mpw_free_string( &operation->serviceName );
+                operation->serviceName = mpw_strdup( operation->user->fullName );
+                operation->resultType = operation->user->loginType;
+                operation->resultState = operation->user->loginState? mpw_strdup( operation->user->loginState ): NULL;
+                operation->keyCounter = MPCounterValueInitial;
+            }
+            break;
+        }
+        case MPKeyPurposeRecovery: {
+            operation->resultState = operation->question->state? mpw_strdup( operation->question->state ): NULL;
+            operation->keyCounter = MPCounterValueInitial;
+            mpw_free_string( &operation->keyContext );
+            operation->keyContext = operation->question->keyword? mpw_strdup( operation->question->keyword ): NULL;
+            break;
+        }
+    }
+}
+
+void cli_keyCounter(Arguments *args, Operation *operation) {
+
+    if (!args->keyCounter)
+        return;
+    if (!operation->service)
+        abort();
+
+    long long int keyCounterInt = strtoll( args->keyCounter, NULL, 0 );
+    if (keyCounterInt < MPCounterValueFirst || keyCounterInt > MPCounterValueLast) {
+        ftl( "Invalid counter: %s", args->keyCounter );
         cli_free( args, operation );
         exit( EX_USAGE );
     }
 
     switch (operation->keyPurpose) {
         case MPKeyPurposeAuthentication:
-            operation->siteCounter = operation->site->counter = (MPCounterValue)siteCounterInt;
+            operation->keyCounter = operation->service->counter = (MPCounterValue)keyCounterInt;
             break;
         case MPKeyPurposeIdentification:
         case MPKeyPurposeRecovery:
@@ -693,7 +712,7 @@ void cli_algorithmVersion(Arguments *args, Operation *operation) {
 
     if (!args->algorithmVersion)
         return;
-    if (!operation->site)
+    if (!operation->service)
         abort();
 
     unsigned long algorithmVersion = strtoul( args->algorithmVersion, NULL, 10 );
@@ -702,13 +721,13 @@ void cli_algorithmVersion(Arguments *args, Operation *operation) {
         cli_free( args, operation );
         exit( EX_USAGE );
     }
-    operation->site->algorithm = (MPAlgorithmVersion)algorithmVersion;
+    operation->service->algorithm = (MPAlgorithmVersion)algorithmVersion;
 }
 
-void cli_sitesRedacted(Arguments *args, Operation *operation) {
+void cli_fileRedacted(Arguments *args, Operation *operation) {
 
-    if (args->sitesRedacted)
-        operation->user->redacted = mpw_get_bool( args->sitesRedacted );
+    if (args->fileRedacted)
+        operation->user->redacted = mpw_get_bool( args->fileRedacted );
 
     else if (!operation->user->redacted)
         wrn( "Sites configuration is not redacted.  Use -R 1 to change this." );
@@ -716,12 +735,12 @@ void cli_sitesRedacted(Arguments *args, Operation *operation) {
 
 void cli_mpw(Arguments *args, Operation *operation) {
 
-    if (!operation->site)
+    if (!operation->service)
         abort();
 
     if (mpw_verbosity >= LogLevelInfo)
         fprintf( stderr, "%s's %s for %s:\n[ %s ]: ",
-                operation->user->fullName, operation->purposeResult, operation->site->siteName, operation->identicon );
+                operation->user->fullName, operation->resultPurpose, operation->service->serviceName, operation->identicon );
 
     // Check user keyID.
     const MPMasterKey *masterKey = NULL;
@@ -732,8 +751,8 @@ void cli_mpw(Arguments *args, Operation *operation) {
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
-    MPKeyID keyID = mpw_id_buf( masterKey, sizeof( *masterKey ) );
-    if (!mpw_id_valid( &operation->user->keyID ) )
+    MPKeyID keyID = mpw_id_buf( masterKey->bytes, sizeof( masterKey->bytes ) );
+    if (!mpw_id_valid( &operation->user->keyID ))
         operation->user->keyID = keyID;
     else if (!mpw_id_equals( &keyID, &operation->user->keyID )) {
         ftl( "Master key mismatch." );
@@ -742,10 +761,10 @@ void cli_mpw(Arguments *args, Operation *operation) {
         exit( EX_SOFTWARE );
     }
 
-    // Resolve master key for site.
+    // Resolve master key for service.
     mpw_free( &masterKey, sizeof( *masterKey ) );
     if (operation->user->masterKeyProvider)
-        masterKey = operation->user->masterKeyProvider( operation->site->algorithm, operation->user->fullName );
+        masterKey = operation->user->masterKeyProvider( operation->service->algorithm, operation->user->fullName );
     if (!masterKey) {
         ftl( "Couldn't derive master key." );
         cli_free( args, operation );
@@ -753,12 +772,13 @@ void cli_mpw(Arguments *args, Operation *operation) {
     }
 
     // Update state from resultParam if stateful.
-    if (operation->resultParam && operation->resultType & MPResultTypeClassStateful) {
+    if (operation->resultType & MPResultTypeClassStateful && operation->resultParam) {
         mpw_free_string( &operation->resultState );
-        if (!(operation->resultState = mpw_site_state( masterKey, operation->site->siteName, operation->siteCounter,
-                operation->keyPurpose, operation->keyContext, operation->resultType, operation->resultParam,
-                operation->site->algorithm ))) {
-            ftl( "Couldn't encrypt site result." );
+        if (!(operation->resultState =
+                mpw_service_state( masterKey, operation->serviceName,
+                        operation->resultType, operation->resultParam,
+                        operation->keyCounter, operation->keyPurpose, operation->keyContext ))) {
+            ftl( "Couldn't encrypt result." );
             mpw_free( &masterKey, sizeof( *masterKey ) );
             cli_free( args, operation );
             exit( EX_SOFTWARE );
@@ -767,13 +787,13 @@ void cli_mpw(Arguments *args, Operation *operation) {
 
         switch (operation->keyPurpose) {
             case MPKeyPurposeAuthentication: {
-                mpw_free_string( &operation->site->resultState );
-                operation->site->resultState = mpw_strdup( operation->resultState );
+                mpw_free_string( &operation->service->resultState );
+                operation->service->resultState = mpw_strdup( operation->resultState );
                 break;
             }
             case MPKeyPurposeIdentification: {
-                mpw_free_string( &operation->site->loginState );
-                operation->site->loginState = mpw_strdup( operation->resultState );
+                mpw_free_string( &operation->service->loginState );
+                operation->service->loginState = mpw_strdup( operation->resultState );
                 break;
             }
 
@@ -793,23 +813,24 @@ void cli_mpw(Arguments *args, Operation *operation) {
         operation->resultParam = mpw_strdup( operation->resultState );
 
     // Generate result.
-    const char *result = mpw_site_result( masterKey, operation->site->siteName, operation->siteCounter,
-            operation->keyPurpose, operation->keyContext, operation->resultType, operation->resultParam, operation->site->algorithm );
+    const char *result = mpw_service_result( masterKey, operation->serviceName,
+            operation->resultType, operation->resultParam,
+            operation->keyCounter, operation->keyPurpose, operation->keyContext );
     mpw_free( &masterKey, sizeof( *masterKey ) );
     if (!result) {
-        ftl( "Couldn't generate site result." );
+        ftl( "Couldn't generate result." );
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
     fflush( NULL );
     fprintf( stdout, "%s\n", result );
-    if (operation->site->url)
-        inf( "See: %s", operation->site->url );
+    if (operation->service->url)
+        inf( "See: %s", operation->service->url );
     mpw_free_string( &result );
 
     // Update usage metadata.
-    operation->site->lastUsed = operation->user->lastUsed = time( NULL );
-    operation->site->uses++;
+    operation->service->lastUsed = operation->user->lastUsed = time( NULL );
+    operation->service->uses++;
 }
 
 void cli_save(Arguments *args, Operation *operation) {
@@ -817,34 +838,34 @@ void cli_save(Arguments *args, Operation *operation) {
     if (!operation->file || !operation->user)
         return;
 
-    if (!operation->sitesFormatFixed)
-        operation->sitesFormat = MPMarshalFormatDefault;
+    if (!operation->fileFormatFixed)
+        operation->fileFormat = MPMarshalFormatDefault;
 
     size_t count = 0;
-    const char **extensions = mpw_format_extensions( operation->sitesFormat, &count );
+    const char **extensions = mpw_format_extensions( operation->fileFormat, &count );
     if (!extensions || !count)
         return;
 
-    mpw_free_string( &operation->sitesPath );
-    operation->sitesPath = mpw_path( operation->user->fullName, extensions[0] );
-    dbg( "Updating: %s (%s)", operation->sitesPath, mpw_format_name( operation->sitesFormat ) );
+    mpw_free_string( &operation->filePath );
+    operation->filePath = mpw_path( operation->user->fullName, extensions[0] );
+    dbg( "Updating: %s (%s)", operation->filePath, mpw_format_name( operation->fileFormat ) );
     mpw_free( &extensions, count * sizeof( *extensions ) );
 
-    FILE *sitesFile = NULL;
-    if (!operation->sitesPath || !mpw_mkdirs( operation->sitesPath ) || !(sitesFile = fopen( operation->sitesPath, "w" ))) {
-        wrn( "Couldn't create updated configuration file:\n  %s: %s", operation->sitesPath, strerror( errno ) );
+    FILE *userFile = NULL;
+    if (!operation->filePath || !mpw_mkdirs( operation->filePath ) || !(userFile = fopen( operation->filePath, "w" ))) {
+        wrn( "Couldn't create updated configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
         return;
     }
 
-    const char *buf = mpw_marshal_write( operation->sitesFormat, &operation->file, operation->user );
+    const char *buf = mpw_marshal_write( operation->fileFormat, &operation->file, operation->user );
     if (!buf || operation->file->error.type != MPMarshalSuccess)
-        wrn( "Couldn't encode updated configuration file:\n  %s: %s", operation->sitesPath, operation->file->error.message );
+        wrn( "Couldn't encode updated configuration file:\n  %s: %s", operation->filePath, operation->file->error.message );
 
-    else if (fwrite( buf, sizeof( char ), strlen( buf ), sitesFile ) != strlen( buf ))
-        wrn( "Error while writing updated configuration file:\n  %s: %d", operation->sitesPath, ferror( sitesFile ) );
+    else if (fwrite( buf, sizeof( char ), strlen( buf ), userFile ) != strlen( buf ))
+        wrn( "Error while writing updated configuration file:\n  %s: %d", operation->filePath, ferror( userFile ) );
 
     mpw_free_string( &buf );
-    fclose( sitesFile );
+    fclose( userFile );
 }
 
 static Operation *__cli_masterKeyProvider_currentOperation = NULL;
