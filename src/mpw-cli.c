@@ -598,19 +598,19 @@ void cli_resultType(Arguments *args, Operation *operation) {
 
     switch (operation->keyPurpose) {
         case MPKeyPurposeAuthentication: {
-            operation->resultPurpose = "password";
+            operation->resultPurpose = "service password";
             operation->resultType = operation->service->resultType;
             operation->algorithm = operation->service->algorithm;
             break;
         }
         case MPKeyPurposeIdentification: {
-            operation->resultPurpose = "login";
+            operation->resultPurpose = "service login";
             operation->resultType = operation->service->loginType;
             operation->algorithm = operation->service->algorithm;
             break;
         }
         case MPKeyPurposeRecovery: {
-            operation->resultPurpose = "answer";
+            operation->resultPurpose = "service answer";
             operation->resultType = operation->question->type;
             operation->algorithm = operation->service->algorithm;
             break;
@@ -660,6 +660,7 @@ void cli_resultState(Arguments *args, Operation *operation) {
             }
             else {
                 // Identification at service-level is none, fall back to user-level.
+                operation->resultPurpose = "global login";
                 mpw_free_string( &operation->serviceName );
                 operation->serviceName = mpw_strdup( operation->user->fullName );
                 operation->resultType = operation->user->loginType;
