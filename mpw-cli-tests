@@ -13,6 +13,7 @@ mpw_expect() {
             u)  user=$OPTARG ;;
             F)  format=$OPTARG ;;
             R)  redacted=$OPTARG ;;
+            t)  type=$OPTARG ;;
             p)  purpose=$OPTARG ;;
             C)  context=$OPTARG ;;
             *)  ;;
@@ -30,15 +31,16 @@ mpw_expect() {
     fi
     [[ -e $file ]] && (( ! keep )) && rm "$file"
 
-    printf '.'
     local result=$(./mpw -q "${args[@]}") err=$?
 
     if (( err )); then
+        printf '*'
         printf >&2 "Error (exit %d) mpw%s\n" "$err" "$(printf ' %q' "${args[@]}")"
         return $(( ++errors ))
     fi
     if [[ $result != $expect ]]; then
-        printf >&2 "Error (got: %s != expected: %s) mpw%s\n" "$result" "$expect" "$(printf ' %q' "${args[@]}")"
+        printf '!'
+        printf >&2 "Bad result (got: %s != expected: %s) mpw%s\n" "$result" "$expect" "$(printf ' %q' "${args[@]}")"
         return $(( ++errors ))
     fi
 
@@ -52,12 +54,14 @@ mpw_expect() {
 
                     case $purpose in
                         a*) result=$password ;;
-                        i*) read _ _ _ result <<< "$one" ;;
+                        i*) [[ ! $type || $type = no* ]] && break
+                            read _ _ _ result <<< "$one" ;;
                         r*) break ;;
                     esac
 
                     if [[ $result != $expect ]]; then
-                        printf >&2 "Error (found: %s != expected: %s) %s (after mpw%s)\n" "$result" "$expect" "$file" "$(printf ' %q' "${args[@]}")"
+                        printf '#'
+                        printf >&2 "Bad mpsites (found: %s != expected: %s) %s (after mpw%s)\n" "$result" "$expect" "$file" "$(printf ' %q' "${args[@]}")"
                         return $(( ++errors ))
                     fi
 
@@ -66,19 +70,23 @@ mpw_expect() {
             ;;
             json)
                 case $purpose in
-                    a*) result=$(jq -r ".sites.\"$site\".password") ;;
-                    i*) result=$(jq -r ".sites.\"$site\".login_name") ;;
-                    r*) result=$(jq -r ".sites.\"$site\".questions.\"$context\".answer") ;;
+                    a*) result=$(jq -r ".services.\"$site\".password") ;;
+                    i*) [[ $type && $type != none ]] \
+                            && result=$(jq -r ".services.\"$site\".login_name") \
+                            || result=$(jq -r ".user.login_name") ;;
+                    r*) result=$(jq -r ".services.\"$site\".questions.\"$context\".answer") ;;
                 esac < "$file"
 
                 if [[ $result != $expect ]]; then
-                    printf >&2 "Error (found: %s != expected: %s) %s (after mpw%s)\n" "$result" "$expect" "$file" "$(printf ' %q' "${args[@]}")"
+                    printf '#'
+                    printf >&2 "Bad mpjson (found: %s != expected: %s) %s (after mpw%s)\n" "$result" "$expect" "$file" "$(printf ' %q' "${args[@]}")"
                     return $(( ++errors ))
                 fi
             ;;
         esac
     fi
 
+    printf '.'
     [[ -e $file ]] && (( ! keep )) && rm "$file"
 }
 
@@ -108,6 +116,8 @@ mpw_expect 'CudmTecuPune7:'         -Fnone \
     -u 'tesẗ' -M 'ẗest' -tlong      -c1 -a3 -p 'authentication' -C ''          '⛄'
 mpw_expect 'mebkovidu'              -Fnone \
     -u 'tesẗ' -M 'ẗest'                     -p 'identification' -C ''          'ẗesẗ'
+mpw_expect 'mebkovidu'              -Fnone \
+    -u 'tesẗ' -M 'ẗest' -tnone      -c1 -a3 -p 'identification' -C ''          'ẗesẗ'
 mpw_expect 'yubfalago'              -Fnone \
     -u 'tesẗ' -M 'ẗest' -tname      -c1 -a3 -p 'identification' -C ''          'ẗesẗ'
 mpw_expect 'jip nodwoqude dizo'     -Fnone \
@@ -263,7 +273,7 @@ mpw_expect 'vuh buxtukewo puhe'     -Fflat -R0 \
 mpw_expect 'Cq5$TfH#OHmPS9yREp7)'   -Fflat -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tmax    -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi.max'
 mpw_expect 'secgudiho'              -Fflat -R0 \
-    -u 'tesẗ.v3' -M 'ẗest'          -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
+    -u 'tesẗ.v3' -M 'ẗest' -tnone   -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'mophabiwe'              -Fflat -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tname   -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'lA^ul!%9&TD%fj6icT1['   -Fflat -R0 \
@@ -297,8 +307,8 @@ mpw_expect 'cez fexlemozo yula'     -Fflat -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tphrase -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.phrase'
 mpw_expect 'T8+xi4NMd3HUGdV#GW*%'   -Fflat -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tmax    -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi.max'
-mpw_expect 'xodxuwemu'              -Fflat -R0 \
-    -u 'tesẗ.v2' -M 'ẗest'          -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
+mpw_expect 'nidcepede'              -Fflat -R0 \
+    -u 'tesẗ.v2' -M 'ẗest' -tnone   -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'camfibeye'              -Fflat -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tname   -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'YLcoWeBwyiBf2*irFq1.'   -Fflat -R0 \
@@ -332,8 +342,8 @@ mpw_expect 'sij jihloyenu kizi'     -Fflat -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tphrase -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.phrase'
 mpw_expect 'z2U9)(uQ78TXqtaus)8.'   -Fflat -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tmax    -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi.max'
-mpw_expect 'vurperoto'              -Fflat -R0 \
-    -u 'tesẗ.v1' -M 'ẗest'          -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
+mpw_expect 'wexducuvi'              -Fflat -R0 \
+    -u 'tesẗ.v1' -M 'ẗest' -tnone   -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'qipberize'              -Fflat -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tname   -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'QMciaKyi1&I*g%tHz99,'   -Fflat -R0 \
@@ -367,8 +377,8 @@ mpw_expect 'xir qebdohogo buno'     -Fflat -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tphrase -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.phrase'
 mpw_expect "RoAm3bJSvo@#loHSRA6\'"  -Fflat -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tmax    -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi.max'
-mpw_expect 'nutlagika'              -Fflat -R0 \
-    -u 'tesẗ.v0' -M 'ẗest'          -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
+mpw_expect 'biqwaxilu'              -Fflat -R0 \
+    -u 'tesẗ.v0' -M 'ẗest' -tnone   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'ragcoxudo'              -Fflat -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tname   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'm8]SiJHiAS@H@Rbw))34'   -Fflat -R0 \
@@ -404,7 +414,7 @@ mpw_expect 'vuh buxtukewo puhe'     -Fjson -R0 \
 mpw_expect 'Cq5$TfH#OHmPS9yREp7)'   -Fjson -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tmax    -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi.max'
 mpw_expect 'secgudiho'              -Fjson -R0 \
-    -u 'tesẗ.v3' -M 'ẗest'          -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
+    -u 'tesẗ.v3' -M 'ẗest' -tnone   -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'mophabiwe'              -Fjson -R0 \
     -u 'tesẗ.v3' -M 'ẗest' -tname   -c1 -a3 -p 'identification' -C ''          'ẗesẗ.c1a3pi'
 mpw_expect 'lA^ul!%9&TD%fj6icT1['   -Fjson -R0 \
@@ -438,8 +448,8 @@ mpw_expect 'cez fexlemozo yula'     -Fjson -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tphrase -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.phrase'
 mpw_expect 'T8+xi4NMd3HUGdV#GW*%'   -Fjson -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tmax    -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi.max'
-mpw_expect 'xodxuwemu'              -Fjson -R0 \
-    -u 'tesẗ.v2' -M 'ẗest'          -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
+mpw_expect 'nidcepede'              -Fjson -R0 \
+    -u 'tesẗ.v2' -M 'ẗest' -tnone   -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'camfibeye'              -Fjson -R0 \
     -u 'tesẗ.v2' -M 'ẗest' -tname   -c1 -a2 -p 'identification' -C ''          'ẗesẗ.c1a2pi'
 mpw_expect 'YLcoWeBwyiBf2*irFq1.'   -Fjson -R0 \
@@ -473,8 +483,8 @@ mpw_expect 'sij jihloyenu kizi'     -Fjson -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tphrase -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.phrase'
 mpw_expect 'z2U9)(uQ78TXqtaus)8.'   -Fjson -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tmax    -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi.max'
-mpw_expect 'vurperoto'              -Fjson -R0 \
-    -u 'tesẗ.v1' -M 'ẗest'          -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
+mpw_expect 'wexducuvi'              -Fjson -R0 \
+    -u 'tesẗ.v1' -M 'ẗest' -tnone   -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'qipberize'              -Fjson -R0 \
     -u 'tesẗ.v1' -M 'ẗest' -tname   -c1 -a1 -p 'identification' -C ''          'ẗesẗ.c1a1pi'
 mpw_expect 'QMciaKyi1&I*g%tHz99,'   -Fjson -R0 \
@@ -508,8 +518,8 @@ mpw_expect 'xir qebdohogo buno'     -Fjson -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tphrase -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.phrase'
 mpw_expect "RoAm3bJSvo@#loHSRA6\'"  -Fjson -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tmax    -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi.max'
-mpw_expect 'nutlagika'              -Fjson -R0 \
-    -u 'tesẗ.v0' -M 'ẗest'          -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
+mpw_expect 'biqwaxilu'              -Fjson -R0 \
+    -u 'tesẗ.v0' -M 'ẗest' -tnone   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'ragcoxudo'              -Fjson -R0 \
     -u 'tesẗ.v0' -M 'ẗest' -tname   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
 mpw_expect 'm8]SiJHiAS@H@Rbw))34'   -Fjson -R0 \

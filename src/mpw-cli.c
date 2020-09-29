@@ -157,6 +157,7 @@ typedef struct {
     MPCounterValue keyCounter;
     MPKeyPurpose keyPurpose;
     const char *keyContext;
+    MPAlgorithmVersion algorithm;
     MPMarshalledFile *file;
     MPMarshalledUser *user;
     MPMarshalledService *service;
@@ -223,11 +224,11 @@ int main(const int argc, char *const argv[]) {
     cli_question( &args, &operation );
 
     // Override the operation parameters from command-line arguments.
+    cli_algorithmVersion( &args, &operation );
     cli_resultType( &args, &operation );
     cli_resultState( &args, &operation );
     cli_resultParam( &args, &operation );
     cli_keyCounter( &args, &operation );
-    cli_algorithmVersion( &args, &operation );
     cli_fileRedacted( &args, &operation );
     cli_free( &args, NULL );
 
@@ -246,7 +247,7 @@ int main(const int argc, char *const argv[]) {
         dbg( "keyCounter       : %u", operation.keyCounter );
         dbg( "keyPurpose       : %s (%u)", mpw_purpose_name( operation.keyPurpose ), operation.keyPurpose );
         dbg( "keyContext       : %s", operation.keyContext );
-        dbg( "algorithmVersion : %u", operation.service->algorithm );
+        dbg( "algorithmVersion : %u", operation.algorithm );
     }
     dbg( "-----------------" );
 
@@ -599,16 +600,19 @@ void cli_resultType(Arguments *args, Operation *operation) {
         case MPKeyPurposeAuthentication: {
             operation->resultPurpose = "password";
             operation->resultType = operation->service->resultType;
+            operation->algorithm = operation->service->algorithm;
             break;
         }
         case MPKeyPurposeIdentification: {
             operation->resultPurpose = "login";
             operation->resultType = operation->service->loginType;
+            operation->algorithm = operation->service->algorithm;
             break;
         }
         case MPKeyPurposeRecovery: {
             operation->resultPurpose = "answer";
             operation->resultType = operation->question->type;
+            operation->algorithm = operation->service->algorithm;
             break;
         }
     }
@@ -661,6 +665,7 @@ void cli_resultState(Arguments *args, Operation *operation) {
                 operation->resultType = operation->user->loginType;
                 operation->resultState = operation->user->loginState? mpw_strdup( operation->user->loginState ): NULL;
                 operation->keyCounter = MPCounterValueInitial;
+                operation->algorithm = operation->user->algorithm;
             }
             break;
         }
@@ -763,7 +768,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
     // Resolve master key for service.
     mpw_free( &masterKey, sizeof( *masterKey ) );
     if (operation->user->masterKeyProvider)
-        masterKey = operation->user->masterKeyProvider( operation->service->algorithm, operation->user->fullName );
+        masterKey = operation->user->masterKeyProvider( operation->algorithm, operation->user->fullName );
     if (!masterKey) {
         ftl( "Couldn't derive master key." );
         cli_free( args, operation );
@@ -791,8 +796,13 @@ void cli_mpw(Arguments *args, Operation *operation) {
                 break;
             }
             case MPKeyPurposeIdentification: {
-                mpw_free_string( &operation->service->loginState );
-                operation->service->loginState = mpw_strdup( operation->resultState );
+                if (strcmp( operation->serviceName, operation->fullName ) == OK) {
+                    mpw_free_string( &operation->user->loginState );
+                    operation->user->loginState = mpw_strdup( operation->resultState );
+                } else {
+                    mpw_free_string( &operation->service->loginState );
+                    operation->service->loginState = mpw_strdup( operation->resultState );
+                }
                 break;
             }
 
@@ -813,8 +823,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
 
     // Generate result.
     const char *result = mpw_service_result( masterKey, operation->serviceName,
-            operation->resultType, operation->resultParam,
-            operation->keyCounter, operation->keyPurpose, operation->keyContext );
+            operation->resultType, operation->resultParam, operation->keyCounter, operation->keyPurpose, operation->keyContext );
     mpw_free( &masterKey, sizeof( *masterKey ) );
     if (!result) {
         ftl( "Couldn't generate result." );
