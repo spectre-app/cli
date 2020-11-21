@@ -744,7 +744,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
     if (!operation->service)
         abort();
 
-    if (mpw_verbosity >= LogLevelInfo)
+    if (mpw_verbosity >= MPLogLevelInfo)
         fprintf( stderr, "%s's %s for %s:\n[ %s ]: ",
                 operation->user->fullName, operation->resultPurpose, operation->service->serviceName, operation->identicon );
 
