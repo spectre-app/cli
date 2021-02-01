@@ -123,11 +123,11 @@ endfunction()
 ### TARGET: MPW
 if( BUILD_MPW )
     # target
-    add_executable( mpw "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c"
-                        "../core/src/mpw-algorithm_v0.c" "../core/src/mpw-algorithm_v1.c" "../core/src/mpw-algorithm_v2.c" "../core/src/mpw-algorithm_v3.c"
-                        "../core/src/mpw-types.c" "../core/src/mpw-util.c" "../core/src/mpw-marshal-util.c" "../core/src/mpw-marshal.c"
+    add_executable( mpw "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c"
+                        "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c"
+                        "api/c/mpw-types.c" "api/c/mpw-util.c" "api/c/mpw-marshal-util.c" "api/c/mpw-marshal.c"
                         "src/mpw-cli-util.c" "src/mpw-cli.c" )
-    target_include_directories( mpw PUBLIC ../core/src src )
+    target_include_directories( mpw PUBLIC api/c src )
     install( TARGETS mpw RUNTIME DESTINATION bin )
 
     # dependencies
@@ -140,10 +140,10 @@ endif()
 ### TARGET: MPW-BENCH
 if( BUILD_MPW_BENCH )
     # target
-    add_executable( mpw-bench "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c"
-                              "../core/src/mpw-algorithm_v0.c" "../core/src/mpw-algorithm_v1.c" "../core/src/mpw-algorithm_v2.c" "../core/src/mpw-algorithm_v3.c"
-                              "../core/src/mpw-types.c" "../core/src/mpw-util.c" "src/mpw-bench.c" )
-    target_include_directories( mpw-bench PUBLIC ../core/src src )
+    add_executable( mpw-bench "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c"
+                              "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c"
+                              "api/c/mpw-types.c" "api/c/mpw-util.c" "src/mpw-bench.c" )
+    target_include_directories( mpw-bench PUBLIC api/c src )
     install( TARGETS mpw-bench RUNTIME DESTINATION bin )
 
     # dependencies
@@ -154,10 +154,10 @@ endif()
 ### TARGET: MPW-TESTS
 if( BUILD_MPW_TESTS )
     # target
-    add_executable( mpw-tests "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c"
-                              "../core/src/mpw-algorithm_v0.c" "../core/src/mpw-algorithm_v1.c" "../core/src/mpw-algorithm_v2.c" "../core/src/mpw-algorithm_v3.c"
-                              "../core/src/mpw-types.c" "../core/src/mpw-util.c" "src/mpw-tests-util.c" "src/mpw-tests.c" )
-    target_include_directories( mpw-tests PUBLIC ../core/src src )
+    add_executable( mpw-tests "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c"
+                              "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c"
+                              "api/c/mpw-types.c" "api/c/mpw-util.c" "src/mpw-tests-util.c" "src/mpw-tests.c" )
+    target_include_directories( mpw-tests PUBLIC api/c src )
     install( TARGETS mpw-tests RUNTIME DESTINATION bin )
 
     # dependencies

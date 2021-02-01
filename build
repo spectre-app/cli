@@ -92,7 +92,7 @@ mpw() {
         "${cflags[@]}"
 
         # mpw paths
-        -I"../core/src" -I"src"
+        -I"api/c" -I"src"
     )
     ldflags=(
         "${ldflags[@]}"
@@ -100,9 +100,9 @@ mpw() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c" \
-       "../core/src/mpw-algorithm_v0.c" "../core/src/mpw-algorithm_v1.c" "../core/src/mpw-algorithm_v2.c" "../core/src/mpw-algorithm_v3.c" \
-       "../core/src/mpw-types.c" "../core/src/mpw-util.c" "../core/src/mpw-marshal-util.c" "../core/src/mpw-marshal.c" "src/mpw-cli-util.c" \
+       "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c" \
+       "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c" \
+       "api/c/mpw-types.c" "api/c/mpw-util.c" "api/c/mpw-marshal-util.c" "api/c/mpw-marshal.c" "src/mpw-cli-util.c" \
        "${ldflags[@]}" "src/mpw-cli.c" -o "mpw"
     echo "done!  You can now run ./mpw-cli-tests, ./install or use ./$_"
 }
@@ -118,7 +118,7 @@ mpw-bench() {
         "${cflags[@]}"
 
         # mpw paths
-        -I"../core/src" -I"src"
+        -I"api/c" -I"src"
     )
     ldflags=(
         "${ldflags[@]}"
@@ -126,9 +126,9 @@ mpw-bench() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c" \
-       "../core/src/mpw-algorithm_v0.c" "../core/src/mpw-algorithm_v1.c" "../core/src/mpw-algorithm_v2.c" "../core/src/mpw-algorithm_v3.c" \
-       "../core/src/mpw-types.c" "../core/src/mpw-util.c" \
+       "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c" \
+       "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c" \
+       "api/c/mpw-types.c" "api/c/mpw-util.c" \
        "${ldflags[@]}" "src/mpw-bench.c" -o "mpw-bench"
     echo "done!  You can now use ./$_"
 }
@@ -145,7 +145,7 @@ mpw-tests() {
         "${cflags[@]}"
 
         # mpw paths
-        -I"../core/src" -I"src"
+        -I"api/c" -I"src"
     )
     ldflags=(
         "${ldflags[@]}"
@@ -153,9 +153,9 @@ mpw-tests() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "../core/src/base64.c" "../core/src/aes.c" "../core/src/mpw-algorithm.c" \
-       "../core/src/mpw-algorithm_v0.c" "../core/src/mpw-algorithm_v1.c" "../core/src/mpw-algorithm_v2.c" "../core/src/mpw-algorithm_v3.c" \
-       "../core/src/mpw-types.c" "../core/src/mpw-util.c" "src/mpw-tests-util.c" \
+       "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c" \
+       "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c" \
+       "api/c/mpw-types.c" "api/c/mpw-util.c" "src/mpw-tests-util.c" \
        "${ldflags[@]}" "src/mpw-tests.c" -o "mpw-tests"
     echo "done!  You can now use ./$_"
 }
