@@ -57,7 +57,7 @@ static const double mpw_show_speed(struct timeval startTime, const unsigned int 
     const double speed = iterations / elapsed;
 
     fprintf( stderr, " done.  " );
-    fprintf( stdout, "%d %s iterations in %lus %uµs -> %.2f/s\n", iterations, operation, dsec, dusec, speed );
+    fprintf( stdout, "%d %s iterations in %lus %luµs -> %.2f/s\n", iterations, operation, (unsigned long)dsec, (unsigned long)dusec, speed );
 
     return speed;
 }
