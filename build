@@ -168,12 +168,12 @@ haslib() {
 cc() (
     (( verbose )) && set -x
 
-    if { hash llvm-gcc; } 2>/dev/null; then
-        llvm-gcc "$@"
+    if { hash clang; } 2>/dev/null; then
+        clang -std=c11 "$@"
+    elif { hash llvm-gcc; } 2>/dev/null; then
+        llvm-gcc -std=c11 "$@"
     elif { hash gcc; } 2>/dev/null; then
         gcc -std=c11 "$@"
-    elif { hash clang; } 2>/dev/null; then
-        clang "$@"
     else
         echo >&2 "Need a compiler.  Please install GCC or LLVM."
         exit 1
