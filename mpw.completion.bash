@@ -7,7 +7,7 @@ _comp_mpw() {
     (( COMP_CWORD )) && pcword=${COMP_WORDS[COMP_CWORD - 1]} 
 
     case $pcword in
-        -u) # complete full names.
+        -u) # complete user names.
             COMPREPLY=( ~/.mpw.d/*.mpsites )
             [[ -e $COMPREPLY ]] || COMPREPLY=()
             COMPREPLY=( "${COMPREPLY[@]##*/}" ) COMPREPLY=( "${COMPREPLY[@]%.mpsites}" )
@@ -31,13 +31,13 @@ _comp_mpw() {
             if [[ $cword = -* ]]; then
                 COMPREPLY=( -u -t -c -V -v -C )
             else
-                local w fullName=$MP_FULLNAME
+                local w userName=$MP_USERNAME
                 for (( w = 0; w < ${#COMP_WORDS[@]}; ++w )); do
-                    [[ ${COMP_WORDS[w]} = -u ]] && fullName=$(xargs <<< "${COMP_WORDS[w + 1]}") && break
+                    [[ ${COMP_WORDS[w]} = -u ]] && userName=$(xargs <<< "${COMP_WORDS[w + 1]}") && break
                 done
-                if [[ -e ~/.mpw.d/"$fullName.mpsites" ]]; then
-                    IFS=$'\n' read -d '' -ra COMPREPLY < <(awk -F$'\t' '!/^ *#/{sub(/^ */, "", $2); print $2}' ~/.mpw.d/"$fullName.mpsites")
-                    printf -v _comp_title 'Sites for %s' "$fullName"
+                if [[ -e ~/.mpw.d/"$userName.mpsites" ]]; then
+                    IFS=$'\n' read -d '' -ra COMPREPLY < <(awk -F$'\t' '!/^ *#/{sub(/^ */, "", $2); print $2}' ~/.mpw.d/"$userName.mpsites")
+                    printf -v _comp_title 'Sites for %s' "$userName"
                 else
                     # Default list from the Alexa Top 500
                     COMPREPLY=(

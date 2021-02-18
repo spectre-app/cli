@@ -1,4 +1,4 @@
-## Added by Master Password
+## Added by Spectre
 source bashlib
 mpw() {
     _copy() {
@@ -17,8 +17,8 @@ mpw() {
     :| _copy 2>/dev/null
 
     # Ask for the user's name and password if not yet known.
-    MPW_FULLNAME=${MPW_FULLNAME:-$(ask 'Your Full Name:')}
+    MPW_USERNAME=${MPW_USERNAME:-$(ask 'Your Full Name:')}
 
-    # Start Master Password and copy the output.
-    printf %s "$(MPW_FULLNAME=$MPW_FULLNAME command mpw "$@")" | _copy
+    # Start Spectre and copy the output.
+    printf %s "$(MPW_USERNAME=$MPW_USERNAME command mpw "$@")" | _copy
 }

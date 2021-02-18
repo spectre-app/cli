@@ -1,13 +1,13 @@
 //==============================================================================
-// This file is part of Master Password.
+// This file is part of Spectre.
 // Copyright (c) 2011-2017, Maarten Billemont.
 //
-// Master Password is free software: you can redistribute it and/or modify
+// Spectre is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Master Password is distributed in the hope that it will be useful,
+// Spectre is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -25,7 +25,7 @@
 #define MP_VERSION ?
 #endif
 
-#define MP_ENV_fullName     "MPW_FULLNAME"
+#define MP_ENV_userName     "MPW_USERNAME"
 #define MP_ENV_algorithm    "MPW_ALGORITHM"
 #define MP_ENV_format       "MPW_FORMAT"
 #define MP_ENV_askpass      "MPW_ASKPASS"

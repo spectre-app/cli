@@ -20,7 +20,7 @@
 #   Finally, the C compiler can be tuned using CFLAGS, LDFLAGS and compiler arguments passed to the script.
 #
 # BUGS
-#   masterpassword@lyndir.com
+#   support@spectre.app
 #
 # AUTHOR
 #   Maarten Billemont
@@ -45,9 +45,9 @@ shift "$(( OPTIND - 1 ))"
 
 # Targets to build
 targets_all=(
-    mpw                     # C CLI version of Master Password (needs: mpw_sodium, optional: mpw_color, mpw_json).
-    mpw-bench               # C CLI Master Password benchmark utility (needs: mpw_sodium).
-    mpw-tests               # C Master Password algorithm test suite (needs: mpw_sodium, mpw_xml).
+    mpw                     # C CLI version of Spectre (needs: mpw_sodium, optional: mpw_color, mpw_json).
+    mpw-bench               # C CLI Spectre benchmark utility (needs: mpw_sodium).
+    mpw-tests               # C Spectre algorithm test suite (needs: mpw_sodium, mpw_xml).
 )
 targets_default='mpw'       # Override with: targets='...' ./build
 targets=${targets[*]:-$targets_default} 

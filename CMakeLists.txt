@@ -1,5 +1,5 @@
 ### CMAKE
-project( masterpassword-cli C )
+project( spectre-cli C )
 cmake_minimum_required( VERSION 3.0.2 )
 
 
@@ -10,9 +10,9 @@ option( USE_JSON                "Support JSON-based user configuration format (d
 option( USE_COLOR               "Colorized identicon (depends on libncurses)." ON )
 option( USE_XML                 "XML parsing (depends on libxml2)." ON )
 
-option( BUILD_MPW               "C CLI version of Master Password (needs: mpw_sodium, optional: mpw_color, mpw_json)." ON )
-option( BUILD_MPW_BENCH         "C CLI Master Password benchmark utility (needs: mpw_sodium)." OFF )
-option( BUILD_MPW_TESTS         "C Master Password algorithm test suite (needs: mpw_sodium, mpw_xml)." OFF )
+option( BUILD_MPW               "C CLI version of Spectre (needs: mpw_sodium, optional: mpw_color, mpw_json)." ON )
+option( BUILD_MPW_BENCH         "C CLI Spectre benchmark utility (needs: mpw_sodium)." OFF )
+option( BUILD_MPW_TESTS         "C Spectre algorithm test suite (needs: mpw_sodium, mpw_xml)." OFF )
 
 # Default build flags.
 set( CMAKE_BUILD_TYPE           Release )

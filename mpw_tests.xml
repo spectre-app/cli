@@ -2,10 +2,10 @@
     <!-- Default values for all parameters. -->
     <case id="default">
         <algorithm>-1</algorithm>
-        <fullName>Robert Lee Mitchell</fullName>
-        <masterPassword>banana colored duckling</masterPassword>
+        <userName>Robert Lee Mitchell</userName>
+        <userSecret>banana colored duckling</userSecret>
         <keyID>98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302</keyID>
-        <serviceName>masterpasswordapp.com</serviceName>
+        <siteName>masterpasswordapp.com</siteName>
         <resultType>Long</resultType>
         <keyCounter>1</keyCounter>
         <keyPurpose>Authentication</keyPurpose>
@@ -17,18 +17,18 @@
         <algorithm>3</algorithm>
         <result>Jejr5[RepuSosp</result>
     </case>
-    <case id="v3_mb_fullName" parent="v3">
-        <fullName>⛄</fullName>
+    <case id="v3_mb_userName" parent="v3">
+        <userName>⛄</userName>
         <keyID>1717AA1F9BF5BA56CD0965CDA3D78E6D2E6A1EA8C067A8EA621F3DDAD4A87EB8</keyID>
         <result>NopaDajh8=Fene</result>
     </case>
-    <case id="v3_mb_masterPassword" parent="v3">
-        <masterPassword>⛄</masterPassword>
+    <case id="v3_mb_userSecret" parent="v3">
+        <userSecret>⛄</userSecret>
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>QesuHirv5-Xepl</result>
     </case>
-    <case id="v3_mb_serviceName" parent="v3">
-        <serviceName>⛄</serviceName>
+    <case id="v3_mb_siteName" parent="v3">
+        <siteName>⛄</siteName>
         <result>LiheCuwhSerz6)</result>
     </case>
     <case id="v3_loginName" parent="v3">
@@ -83,18 +83,18 @@
         <algorithm>2</algorithm>
         <result>Jejr5[RepuSosp</result>
     </case>
-    <case id="v2_mb_fullName" parent="v2">
-        <fullName>⛄</fullName>
+    <case id="v2_mb_userName" parent="v2">
+        <userName>⛄</userName>
         <keyID>4D5851D0B093D65DE0CF13D94877270468C0B65A6E42CA50D393AC9B99C457B5</keyID>
         <result>WaqoGuho2[Xaxw</result>
     </case>
-    <case id="v2_mb_masterPassword" parent="v2">
-        <masterPassword>⛄</masterPassword>
+    <case id="v2_mb_userSecret" parent="v2">
+        <userSecret>⛄</userSecret>
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>QesuHirv5-Xepl</result>
     </case>
-    <case id="v2_mb_serviceName" parent="v2">
-        <serviceName>⛄</serviceName>
+    <case id="v2_mb_siteName" parent="v2">
+        <siteName>⛄</siteName>
         <result>LiheCuwhSerz6)</result>
     </case>
     <case id="v2_loginName" parent="v2">
@@ -149,18 +149,18 @@
         <algorithm>1</algorithm>
         <result>Jejr5[RepuSosp</result>
     </case>
-    <case id="v1_mb_fullName" parent="v1">
-        <fullName>⛄</fullName>
+    <case id="v1_mb_userName" parent="v1">
+        <userName>⛄</userName>
         <keyID>4D5851D0B093D65DE0CF13D94877270468C0B65A6E42CA50D393AC9B99C457B5</keyID>
         <result>WaqoGuho2[Xaxw</result>
     </case>
-    <case id="v1_mb_masterPassword" parent="v1">
-        <masterPassword>⛄</masterPassword>
+    <case id="v1_mb_userSecret" parent="v1">
+        <userSecret>⛄</userSecret>
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>QesuHirv5-Xepl</result>
     </case>
-    <case id="v1_mb_serviceName" parent="v1">
-        <serviceName>⛄</serviceName>
+    <case id="v1_mb_siteName" parent="v1">
+        <siteName>⛄</siteName>
         <result>WawiYarp2@Kodh</result>
     </case>
     <case id="v1_loginName" parent="v1">
@@ -215,18 +215,18 @@
         <algorithm>0</algorithm>
         <result>Feji5@ReduWosh</result>
     </case>
-    <case id="v0_mb_fullName" parent="v0">
-        <fullName>⛄</fullName>
+    <case id="v0_mb_userName" parent="v0">
+        <userName>⛄</userName>
         <keyID>4D5851D0B093D65DE0CF13D94877270468C0B65A6E42CA50D393AC9B99C457B5</keyID>
         <result>HajrYudo7@Mamh</result>
     </case>
-    <case id="v0_mb_masterPassword" parent="v0">
-        <masterPassword>⛄</masterPassword>
+    <case id="v0_mb_userSecret" parent="v0">
+        <userSecret>⛄</userSecret>
         <keyID>351432B8528A5ABECAB768CA95015097DE76FE14C41E10AF36C67DCFB8917E08</keyID>
         <result>MewmDini0]Meho</result>
     </case>
-    <case id="v0_mb_serviceName" parent="v0">
-        <serviceName>⛄</serviceName>
+    <case id="v0_mb_siteName" parent="v0">
+        <siteName>⛄</siteName>
         <result>HahiVana2@Nole</result>
     </case>
     <case id="v0_loginName" parent="v0">

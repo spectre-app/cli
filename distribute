@@ -25,11 +25,11 @@ echo "Installing archive and signature in site .."
 cd ../../public/site
 mv "$OLDPWD/$mpwArchive" .; [[ -e $_ ]]
 mv "$OLDPWD/$mpwArchive.sig" .; [[ -e $_ ]]
-ln -sf "$mpwArchive" "masterpassword-cli.tar.gz"; [[ -e $_ ]]
-ln -sf "$mpwArchive.sig" "masterpassword-cli.tar.gz.sig"; [[ -e $_ ]]
+ln -sf "$mpwArchive" "spectre-cli.tar.gz"; [[ -e $_ ]]
+ln -sf "$mpwArchive.sig" "spectre-cli.tar.gz.sig"; [[ -e $_ ]]
 
 echo
 echo "Done.  Ready to publish the site."
 echo "     package: $mpwArchive"
 echo "   signature: $mpwArchive.sig"
-echo "         url: https://masterpassword.app/$mpwArchive"
+echo "         url: https://spectre.app/$mpwArchive"

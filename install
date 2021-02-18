@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Install the Master Password CLI tool.
+# Install the Spectre CLI tool.
 set -e
 cd "${BASH_SOURCE%/*}"
 source bashlib
@@ -22,7 +22,7 @@ bindir=$(ask -d "$bindir" "What bin directory should I install to?")
 [[ -d "$bindir" ]] || mkdir "$bindir" || ftl 'Cannot create missing bin directory: %s' "$bindir" || exit
 [[ -w "$bindir" ]] || ftl 'Cannot write to bin directory: %s' "$bindir" || exit
 
-# Install Master Password.
+# Install Spectre.
 install -m555 mpw "$bindir"
 [[ ! -e "$bindir/bashlib" ]] && install bashlib "$bindir" ||:
 
@@ -45,11 +45,11 @@ fi
 echo
 
 inf "You can also save your user name in ~/.bashrc.  Leave blank to skip this step."
-if MPW_FULLNAME=$(ask "Your full name:") && [[ $MPW_FULLNAME ]] ; then
-    printf 'export MPW_FULLNAME=%q\n' "$MPW_FULLNAME" >> ~/.bashrc
+if MPW_USERNAME=$(ask "Your full name:") && [[ $MPW_USERNAME ]] ; then
+    printf 'export MPW_USERNAME=%q\n' "$MPW_USERNAME" >> ~/.bashrc
 fi
 inf "If you have an askpass program you'd like to use, you can specify it here."
-inf "An askpass program provides a graphical interface for entering things like your master password."
+inf "An askpass program provides a graphical interface for entering things like your personal secret."
 inf "Leave blank to skip this step and enter passwords using the terminal."
 if [[ ! $MPW_ASKPASS ]] && hash ssh-askpass 2>/dev/null; then
     MPW_ASKPASS=ssh-askpass
@@ -61,4 +61,4 @@ echo
 
 inf "Shell features installed."
 inf "To load these convenience features into your already running shell, type: source ~/.bashrc"
-inf "To begin using Master Password, type: mpw -h or mpw my-site-name"
+inf "To begin using Spectre, type: mpw -h or mpw my-site-name"

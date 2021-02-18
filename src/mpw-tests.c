@@ -1,13 +1,13 @@
 //==============================================================================
-// This file is part of Master Password.
+// This file is part of Spectre.
 // Copyright (c) 2011-2017, Maarten Billemont.
 //
-// Master Password is free software: you can redistribute it and/or modify
+// Spectre is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Master Password is distributed in the hope that it will be useful,
+// Spectre is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -41,9 +41,9 @@
 static void usage() {
 
     inf( ""
-            "  Master Password v%s - Tests\n"
+            "  Spectre v%s - Tests\n"
             "--------------------------------------------------------------------------------\n"
-            "      https://masterpassword.app\n", stringify_def( MP_VERSION ) );
+            "      https://spectre.app\n", stringify_def( MP_VERSION ) );
     inf( ""
             "\nUSAGE\n\n"
             "  mpw-tests [-v|-q]* [-h] [test-name ...]\n" );
@@ -94,10 +94,10 @@ int main(int argc, char *const argv[]) {
         // Read in the test case.
         xmlChar *id = mpw_xmlTestCaseString( testCase, "id" );
         MPAlgorithmVersion algorithm = (MPAlgorithmVersion)mpw_xmlTestCaseInteger( testCase, "algorithm" );
-        xmlChar *fullName = mpw_xmlTestCaseString( testCase, "fullName" );
-        xmlChar *masterPassword = mpw_xmlTestCaseString( testCase, "masterPassword" );
+        xmlChar *userName = mpw_xmlTestCaseString( testCase, "userName" );
+        xmlChar *userSecret = mpw_xmlTestCaseString( testCase, "userSecret" );
         MPKeyID keyID = mpw_id_str( (char *)mpw_xmlTestCaseString( testCase, "keyID" ) );
-        xmlChar *serviceName = mpw_xmlTestCaseString( testCase, "serviceName" );
+        xmlChar *siteName = mpw_xmlTestCaseString( testCase, "siteName" );
         MPCounterValue keyCounter = (MPCounterValue)mpw_xmlTestCaseInteger( testCase, "keyCounter" );
         xmlChar *resultTypeString = mpw_xmlTestCaseString( testCase, "resultType" );
         xmlChar *keyPurposeString = mpw_xmlTestCaseString( testCase, "keyPurpose" );
@@ -124,31 +124,31 @@ int main(int argc, char *const argv[]) {
                 continue;
             }
 
-            // 1. calculate the master key.
-            const MPMasterKey *masterKey = mpw_master_key(
-                    (char *)fullName, (char *)masterPassword, algorithm );
-            if (!masterKey) {
-                ftl( "Couldn't derive master key." );
+            // 1. calculate the user key.
+            const MPUserKey *userKey = mpw_user_key(
+                    (char *)userName, (char *)userSecret, algorithm );
+            if (!userKey) {
+                ftl( "Couldn't derive user key." );
                 abort();
             }
 
-            // Check the master key.
-            if (!mpw_id_equals( &keyID, &masterKey->keyID )) {
+            // Check the user key.
+            if (!mpw_id_equals( &keyID, &userKey->keyID )) {
                 ++failedTests;
-                fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", masterKey->keyID.hex, keyID.hex );
+                fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", userKey->keyID.hex, keyID.hex );
                 continue;
             }
 
-            // 2. calculate the service password.
-            const char *testResult = mpw_service_result(
-                    masterKey, (char *)serviceName, resultType, NULL, keyCounter, keyPurpose, (char *)keyContext );
-            mpw_free( &masterKey, sizeof( *masterKey ) );
+            // 2. calculate the site password.
+            const char *testResult = mpw_site_result(
+                    userKey, (char *)siteName, resultType, NULL, keyCounter, keyPurpose, (char *)keyContext );
+            mpw_free( &userKey, sizeof( *userKey ) );
             if (!testResult) {
-                ftl( "Couldn't derive service password." );
+                ftl( "Couldn't derive site password." );
                 continue;
             }
 
-            // Check the service result.
+            // Check the site result.
             if (xmlStrcmp( result, BAD_CAST testResult ) != 0) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (result: got %s != expected %s)\n", testResult, result );
@@ -162,9 +162,9 @@ int main(int argc, char *const argv[]) {
 
         // Free test case.
         xmlFree( id );
-        xmlFree( fullName );
-        xmlFree( masterPassword );
-        xmlFree( serviceName );
+        xmlFree( userName );
+        xmlFree( userSecret );
+        xmlFree( siteName );
         xmlFree( resultTypeString );
         xmlFree( keyPurposeString );
         xmlFree( keyContext );

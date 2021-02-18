@@ -1,13 +1,13 @@
 //==============================================================================
-// This file is part of Master Password.
+// This file is part of Spectre.
 // Copyright (c) 2011-2017, Maarten Billemont.
 //
-// Master Password is free software: you can redistribute it and/or modify
+// Spectre is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Master Password is distributed in the hope that it will be useful,
+// Spectre is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -18,7 +18,7 @@
 
 //
 //  mpw-bench.c
-//  MasterPassword
+//  Spectre
 //
 //  Created by Maarten Billemont on 2014-12-20.
 //  Copyright (c) 2014 Lyndir. All rights reserved.
@@ -64,9 +64,9 @@ static const double mpw_show_speed(struct timeval startTime, const unsigned int 
 
 int main(int argc, char *const argv[]) {
 
-    const char *fullName = "Robert Lee Mitchel";
-    const char *masterPassword = "banana colored duckling";
-    const char *serviceName = "masterpassword.app";
+    const char *userName = "Robert Lee Mitchel";
+    const char *userSecret = "banana colored duckling";
+    const char *siteName = "spectre.app";
     const MPResultType resultType = MPResultTypeDefaultResult;
     const MPCounterValue keyCounter = MPCounterValueDefault;
     const MPKeyPurpose keyPurpose = MPKeyPurposeAuthentication;
@@ -77,23 +77,23 @@ int main(int argc, char *const argv[]) {
 
     // Start HMAC-SHA-256
     // Similar to phase-two of mpw
-    uint8_t *servicePasswordInfo = malloc( 128 );
+    uint8_t *sitePasswordInfo = malloc( 128 );
     iterations = 4200000; /* tuned to ~10s on dev machine */
-    const MPMasterKey *masterKey = mpw_master_key( fullName, masterPassword, MPAlgorithmVersionCurrent );
-    if (!masterKey) {
-        ftl( "Could not allocate master key: %s", strerror( errno ) );
+    const MPUserKey *userKey = mpw_user_key( userName, userSecret, MPAlgorithmVersionCurrent );
+    if (!userKey) {
+        ftl( "Could not allocate user key: %s", strerror( errno ) );
         abort();
     }
     mpw_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
         uint8_t mac[32];
-        mpw_hash_hmac_sha256( mac, masterKey->bytes, sizeof( masterKey->bytes ), servicePasswordInfo, 128 );
+        mpw_hash_hmac_sha256( mac, userKey->bytes, sizeof( userKey->bytes ), sitePasswordInfo, 128 );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rhmac-sha-256: iteration %d / %d (%.0f%%)..", i, iterations, percent );
     }
     const double hmacSha256Speed = mpw_show_speed( startTime, iterations, "hmac-sha-256" );
-    free( (void *)masterKey );
+    free( (void *)userKey );
 
     // Start BCrypt
     // Similar to phase-one of mpw
@@ -101,7 +101,7 @@ int main(int argc, char *const argv[]) {
     iterations = 170; /* tuned to ~10s on dev machine */
     mpw_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
-        bcrypt( masterPassword, bcrypt_gensalt( bcrypt_rounds ) );
+        bcrypt( userSecret, bcrypt_gensalt( bcrypt_rounds ) );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rbcrypt (rounds 10^%d): iteration %d / %d (%.0f%%)..", bcrypt_rounds, i, iterations, percent );
@@ -113,7 +113,7 @@ int main(int argc, char *const argv[]) {
     iterations = 50; /* tuned to ~10s on dev machine */
     mpw_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
-        free( (void *)mpw_master_key( fullName, masterPassword, MPAlgorithmVersionCurrent ) );
+        free( (void *)mpw_user_key( userName, userSecret, MPAlgorithmVersionCurrent ) );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rscrypt_mpw: iteration %d / %d (%.0f%%)..", i, iterations, percent );
@@ -125,15 +125,15 @@ int main(int argc, char *const argv[]) {
     iterations = 50; /* tuned to ~10s on dev machine */
     mpw_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
-        masterKey = mpw_master_key( fullName, masterPassword, MPAlgorithmVersionCurrent );
-        if (!masterKey) {
-            ftl( "Could not allocate master key: %s", strerror( errno ) );
+        userKey = mpw_user_key( userName, userSecret, MPAlgorithmVersionCurrent );
+        if (!userKey) {
+            ftl( "Could not allocate user key: %s", strerror( errno ) );
             break;
         }
 
-        free( (void *)mpw_service_result(
-                masterKey, serviceName, resultType, NULL, keyCounter, keyPurpose, keyContext ) );
-        free( (void *)masterKey );
+        free( (void *)mpw_site_result(
+                userKey, siteName, resultType, NULL, keyCounter, keyPurpose, keyContext ) );
+        free( (void *)userKey );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rmpw: iteration %d / %d (%.0f%%)..", i, iterations, percent );
