@@ -42,7 +42,7 @@ static void usage() {
          "\nUSAGE\n\n"
          "  mpw [-u|-U user-name] [-s fd] [-t pw-type] [-P value] [-c counter]\n"
          "      [-a version] [-p purpose] [-C context] [-f|F format] [-R 0|1]\n"
-         "      [-v|-q]* [-h] [site-name]\n" );
+         "      [-v|-q]* [-n] [-h] [site-name]\n" );
     inf( ""
          "  -u user-name Specify the user name of the user.\n"
          "               -u checks the personal secret against the config,\n"
@@ -111,9 +111,11 @@ static void usage() {
          "  -v           Increase output verbosity (can be repeated).\n"
          "  -q           Decrease output verbosity (can be repeated).\n" );
     inf( ""
+         "  -n           Omit trailing newline in output.\n" );
+    inf( ""
          "  -h           Show this help output instead of performing any operation.\n" );
     inf( ""
-         "  site-name Name of the site for which to generate a token.\n" );
+         "  site-name    Name of the site for which to generate a token.\n" );
     inf( ""
          "\nENVIRONMENT\n\n"
          "  %-12s The user name of the user (see -u).\n"
@@ -142,6 +144,7 @@ typedef struct {
 } Arguments;
 
 typedef struct {
+    bool omitNewline;
     bool allowPasswordUpdate;
     bool fileFormatFixed;
     MPMarshalFormat fileFormat;
@@ -283,7 +286,7 @@ void cli_free(Arguments *args, Operation *operation) {
 
 void cli_args(Arguments *args, Operation *operation, const int argc, char *const argv[]) {
 
-    for (int opt; (opt = getopt( argc, argv, "u:U:s:S:t:P:c:a:p:C:f:F:R:vqh" )) != EOF;
+    for (int opt; (opt = getopt( argc, argv, "u:U:s:S:t:P:c:a:p:C:f:F:R:vqnh" )) != EOF;
          optarg? mpw_zero( optarg, strlen( optarg ) ): (void)0)
         switch (opt) {
             case 'u':
@@ -335,6 +338,9 @@ void cli_args(Arguments *args, Operation *operation, const int argc, char *const
                 break;
             case 'q':
                 --mpw_verbosity;
+                break;
+            case 'n':
+                operation->omitNewline = true;
                 break;
             case 'h':
                 usage();
@@ -832,7 +838,9 @@ void cli_mpw(Arguments *args, Operation *operation) {
         exit( EX_SOFTWARE );
     }
     fflush( NULL );
-    fprintf( stdout, "%s\n", result );
+    fprintf( stdout, "%s", result );
+    if (!operation->omitNewline)
+        fprintf( stdout, "\n" );
     if (operation->site->url)
         inf( "See: %s", operation->site->url );
     mpw_free_string( &result );
