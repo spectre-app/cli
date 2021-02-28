@@ -6,30 +6,30 @@ tag=$(git describe --exact-match --match '*-cli*') || { echo >&2 "Tree is not at
 version=$(git describe --match '*-cli*' --long --dirty --broken)
 [[ $version != *-dirty ]] || { echo >&2 "Tree is dirty, first commit any changes."; exit 1; }
 
-mpwArchive=mpw-$version.tar.gz
-[[ -e $mpwArchive ]] && echo >&2 "WARNING: $mpwArchive already exists.  Will overwrite."
-read -n1 -p "Will prepare and release $mpwArchive.  Press a key to continue or ^C to abort."
+spectreArchive=spectre-$version.tar.gz
+[[ -e $spectreArchive ]] && echo >&2 "WARNING: $spectreArchive already exists.  Will overwrite."
+read -n1 -p "Will prepare and release $spectreArchive.  Press a key to continue or ^C to abort."
 
 echo "Cleaning .."
 git clean -ffdx .
 
-echo "Creating archive $mpwArchive .."
+echo "Creating archive $spectreArchive .."
 echo "$version" > VERSION
 git show --show-signature --pretty=format:%H --quiet "$tag" > TAG
-{ git ls-files -z .; printf '%s\0' VERSION TAG; } | xargs -0 tar -Lcvzf "$mpwArchive"
+{ git ls-files -z .; printf '%s\0' VERSION TAG; } | xargs -0 tar -Lcvzf "$spectreArchive"
 
-echo "Creating archive signature $mpwArchive.sig .."
-gpg --detach-sign --local-user 5C2D1D61853F20F2FCDDCCB70EF21226F43EA6BC "$mpwArchive"
+echo "Creating archive signature $spectreArchive.sig .."
+gpg --detach-sign --local-user 5C2D1D61853F20F2FCDDCCB70EF21226F43EA6BC "$spectreArchive"
 
 echo "Installing archive and signature in site .."
 cd ../../public/site
-mv "$OLDPWD/$mpwArchive" .; [[ -e $_ ]]
-mv "$OLDPWD/$mpwArchive.sig" .; [[ -e $_ ]]
-ln -sf "$mpwArchive" "spectre-cli.tar.gz"; [[ -e $_ ]]
-ln -sf "$mpwArchive.sig" "spectre-cli.tar.gz.sig"; [[ -e $_ ]]
+mv "$OLDPWD/$spectreArchive" .; [[ -e $_ ]]
+mv "$OLDPWD/$spectreArchive.sig" .; [[ -e $_ ]]
+ln -sf "$spectreArchive" "spectre-cli.tar.gz"; [[ -e $_ ]]
+ln -sf "$spectreArchive.sig" "spectre-cli.tar.gz.sig"; [[ -e $_ ]]
 
 echo
 echo "Done.  Ready to publish the site."
-echo "     package: $mpwArchive"
-echo "   signature: $mpwArchive.sig"
-echo "         url: https://spectre.app/$mpwArchive"
+echo "     package: $spectreArchive"
+echo "   signature: $spectreArchive.sig"
+echo "         url: https://spectre.app/$spectreArchive"

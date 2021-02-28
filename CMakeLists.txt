@@ -10,9 +10,9 @@ option( USE_JSON                "Support JSON-based user configuration format (d
 option( USE_COLOR               "Colorized identicon (depends on libncurses)." ON )
 option( USE_XML                 "XML parsing (depends on libxml2)." ON )
 
-option( BUILD_MPW               "C CLI version of Spectre (needs: mpw_sodium, optional: mpw_color, mpw_json)." ON )
-option( BUILD_MPW_BENCH         "C CLI Spectre benchmark utility (needs: mpw_sodium)." OFF )
-option( BUILD_MPW_TESTS         "C Spectre algorithm test suite (needs: mpw_sodium, mpw_xml)." OFF )
+option( BUILD_SPECTRE           "C CLI version of Spectre (needs: spectre_sodium, optional: spectre_color, spectre_json)." ON )
+option( BUILD_SPECTRE_BENCH     "C CLI Spectre benchmark utility (needs: spectre_sodium)." OFF )
+option( BUILD_SPECTRE_TESTS     "C Spectre algorithm test suite (needs: spectre_sodium, spectre_xml)." OFF )
 
 # Default build flags.
 set( CMAKE_BUILD_TYPE           Release )
@@ -22,25 +22,25 @@ set( CMAKE_C_FLAGS              "-O3" )
 find_package( Git )
 if( GIT_FOUND )
     execute_process( COMMAND    "${GIT_EXECUTABLE}" describe --match *-cli* --long --dirty
-                     OUTPUT_VARIABLE mpw_version OUTPUT_STRIP_TRAILING_WHITESPACE )
+                     OUTPUT_VARIABLE spectre_version OUTPUT_STRIP_TRAILING_WHITESPACE )
 endif()
-if( NOT mpw_version MATCHES "." )
-    file( READ                  "VERSION" mpw_version )
-    string( STRIP               "${mpw_version}" mpw_version )
+if( NOT spectre_version MATCHES "." )
+    file( READ                  "VERSION" spectre_version )
+    string( STRIP               "${spectre_version}" spectre_version )
 endif()
-if( mpw_version MATCHES "." )
-    add_definitions(            "-DMP_VERSION=${mpw_version}" )
-    message( STATUS             "Current mpw source version ${mpw_version}..." )
+if( spectre_version MATCHES "." )
+    add_definitions(            "-DMP_VERSION=${spectre_version}" )
+    message( STATUS             "Current spectre source version ${spectre_version}..." )
 else()
-    message( STATUS             "Current mpw source version unknown..." )
+    message( STATUS             "Current spectre source version unknown..." )
 endif()
 
 
 ### DEPENDENCIES
-function( use_mpw_sodium t r )
+function( use_spectre_sodium t r )
     if( USE_SODIUM )
         target_link_libraries(  "${t}" PRIVATE sodium )
-        target_compile_definitions( "${t}" PRIVATE -DMPW_SODIUM=1 )
+        target_compile_definitions( "${t}" PRIVATE -DSPECTRE_SODIUM=1 )
         message( STATUS         "${t}: USE_SODIUM is enabled." )
 
     elseif( r STREQUAL "required" )
@@ -52,13 +52,13 @@ function( use_mpw_sodium t r )
     endif()
 endfunction()
 
-function( use_mpw_color t )
+function( use_spectre_color t )
     find_package( Curses )
     if( USE_COLOR )
         if ( CURSES_FOUND )
             target_include_directories( "${t}" PRIVATE ${CURSES_INCLUDE_DIR} )
             target_link_libraries( "${t}" PRIVATE ${CURSES_LIBRARIES} )
-            target_compile_definitions( "${t}" PRIVATE -DMPW_COLOR=1 ${CURSES_DEFINITIONS} )
+            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_COLOR=1 ${CURSES_DEFINITIONS} )
             message( STATUS     "${t}: USE_COLOR is enabled." )
 
         elseif( r STREQUAL "required" )
@@ -78,10 +78,10 @@ function( use_mpw_color t )
     endif()
 endfunction()
 
-function( use_mpw_json t )
+function( use_spectre_json t )
     if( USE_JSON )
         target_link_libraries(  "${t}" PRIVATE json-c )
-        target_compile_definitions( "${t}" PRIVATE -DMPW_JSON=1 )
+        target_compile_definitions( "${t}" PRIVATE -DSPECTRE_JSON=1 )
         message( STATUS         "${t}: USE_JSON is enabled." )
 
     elseif( r STREQUAL "required" )
@@ -93,13 +93,13 @@ function( use_mpw_json t )
     endif()
 endfunction()
 
-function( use_mpw_xml t r )
+function( use_spectre_xml t r )
     find_package( LibXml2 )
     if( USE_XML )
         if ( LIBXML2_FOUND )
             target_include_directories( "${t}" PRIVATE ${LIBXML2_INCLUDE_DIR} )
             target_link_libraries( "${t}" PRIVATE ${LIBXML2_LIBRARIES} )
-            target_compile_definitions( "${t}" PRIVATE -DMPW_XML=1 ${LIBXML2_DEFINITIONS} )
+            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_XML=1 ${LIBXML2_DEFINITIONS} )
             message( STATUS     "${t}: USE_XML is enabled." )
 
         elseif( r STREQUAL "required" )
@@ -120,47 +120,47 @@ function( use_mpw_xml t r )
 endfunction()
 
 
-### TARGET: MPW
-if( BUILD_MPW )
+### TARGET: SPECTRE
+if( BUILD_SPECTRE )
     # target
-    add_executable( mpw "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c"
-                        "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c"
-                        "api/c/mpw-types.c" "api/c/mpw-util.c" "api/c/mpw-marshal-util.c" "api/c/mpw-marshal.c"
-                        "src/mpw-cli-util.c" "src/mpw-cli.c" )
-    target_include_directories( mpw PUBLIC api/c src )
-    install( TARGETS mpw RUNTIME DESTINATION bin )
+    add_executable( spectre "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c"
+                        "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c"
+                        "api/c/spectre-types.c" "api/c/spectre-util.c" "api/c/spectre-marshal-util.c" "api/c/spectre-marshal.c"
+                        "src/spectre-cli-util.c" "src/spectre-cli.c" )
+    target_include_directories( spectre PUBLIC api/c src )
+    install( TARGETS spectre RUNTIME DESTINATION bin )
 
     # dependencies
-    use_mpw_sodium( mpw required )
-    use_mpw_color( mpw optional )
-    use_mpw_json( mpw optional )
+    use_spectre_sodium( spectre required )
+    use_spectre_color( spectre optional )
+    use_spectre_json( spectre optional )
 endif()
 
 
-### TARGET: MPW-BENCH
-if( BUILD_MPW_BENCH )
+### TARGET: SPECTRE-BENCH
+if( BUILD_SPECTRE_BENCH )
     # target
-    add_executable( mpw-bench "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c"
-                              "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c"
-                              "api/c/mpw-types.c" "api/c/mpw-util.c" "src/mpw-bench.c" )
-    target_include_directories( mpw-bench PUBLIC api/c src )
-    install( TARGETS mpw-bench RUNTIME DESTINATION bin )
+    add_executable( spectre-bench "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c"
+                              "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c"
+                              "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-bench.c" )
+    target_include_directories( spectre-bench PUBLIC api/c src )
+    install( TARGETS spectre-bench RUNTIME DESTINATION bin )
 
     # dependencies
-    use_mpw_sodium( mpw-bench required )
+    use_spectre_sodium( spectre-bench required )
 endif()
 
 
-### TARGET: MPW-TESTS
-if( BUILD_MPW_TESTS )
+### TARGET: SPECTRE-TESTS
+if( BUILD_SPECTRE_TESTS )
     # target
-    add_executable( mpw-tests "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c"
-                              "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c"
-                              "api/c/mpw-types.c" "api/c/mpw-util.c" "src/mpw-tests-util.c" "src/mpw-tests.c" )
-    target_include_directories( mpw-tests PUBLIC api/c src )
-    install( TARGETS mpw-tests RUNTIME DESTINATION bin )
+    add_executable( spectre-tests "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c"
+                              "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c"
+                              "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-tests-util.c" "src/spectre-tests.c" )
+    target_include_directories( spectre-tests PUBLIC api/c src )
+    install( TARGETS spectre-tests RUNTIME DESTINATION bin )
 
     # dependencies
-    use_mpw_sodium( mpw-tests required )
-    use_mpw_xml( mpw-tests required )
+    use_spectre_sodium( spectre-tests required )
+    use_spectre_xml( spectre-tests required )
 endif()

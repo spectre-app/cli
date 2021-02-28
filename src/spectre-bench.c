@@ -17,7 +17,7 @@
 //==============================================================================
 
 //
-//  mpw-bench.c
+//  spectre-bench.c
 //  Spectre
 //
 //  Created by Maarten Billemont on 2014-12-20.
@@ -33,23 +33,23 @@
 
 #include "bcrypt.c"
 
-#include "mpw-algorithm.h"
-#include "mpw-util.h"
+#include "spectre-algorithm.h"
+#include "spectre-util.h"
 
-#define MP_N                32768
-#define MP_r                8
-#define MP_p                2
+#define Spectre_N                32768
+#define Spectre_r                8
+#define Spectre_p                2
 
-static void mpw_time(struct timeval *time) {
+static void spectre_time(struct timeval *time) {
 
     if (gettimeofday( time, NULL ) != OK)
         ftl( "Could not get time: %s", strerror( errno ) );
 }
 
-static const double mpw_show_speed(struct timeval startTime, const unsigned int iterations, const char *operation) {
+static const double spectre_show_speed(struct timeval startTime, const unsigned int iterations, const char *operation) {
 
     struct timeval endTime;
-    mpw_time( &endTime );
+    spectre_time( &endTime );
 
     const time_t dsec = (endTime.tv_sec - startTime.tv_sec);
     const suseconds_t dusec = (endTime.tv_usec - startTime.tv_usec);
@@ -67,83 +67,83 @@ int main(int argc, char *const argv[]) {
     const char *userName = "Robert Lee Mitchel";
     const char *userSecret = "banana colored duckling";
     const char *siteName = "spectre.app";
-    const MPResultType resultType = MPResultTypeDefaultResult;
-    const MPCounterValue keyCounter = MPCounterValueDefault;
-    const MPKeyPurpose keyPurpose = MPKeyPurposeAuthentication;
+    const SpectreResultType resultType = SpectreResultDefaultResult;
+    const SpectreCounter keyCounter = SpectreCounterDefault;
+    const SpectreKeyPurpose keyPurpose = SpectreKeyPurposeAuthentication;
     const char *keyContext = NULL;
     struct timeval startTime;
     unsigned int iterations;
     float percent;
 
     // Start HMAC-SHA-256
-    // Similar to phase-two of mpw
+    // Similar to phase-two of spectre
     uint8_t *sitePasswordInfo = malloc( 128 );
     iterations = 4200000; /* tuned to ~10s on dev machine */
-    const MPUserKey *userKey = mpw_user_key( userName, userSecret, MPAlgorithmVersionCurrent );
+    const SpectreUserKey *userKey = spectre_user_key( userName, userSecret, SpectreAlgorithmCurrent );
     if (!userKey) {
         ftl( "Could not allocate user key: %s", strerror( errno ) );
         abort();
     }
-    mpw_time( &startTime );
+    spectre_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
         uint8_t mac[32];
-        mpw_hash_hmac_sha256( mac, userKey->bytes, sizeof( userKey->bytes ), sitePasswordInfo, 128 );
+        spectre_hash_hmac_sha256( mac, userKey->bytes, sizeof( userKey->bytes ), sitePasswordInfo, 128 );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rhmac-sha-256: iteration %d / %d (%.0f%%)..", i, iterations, percent );
     }
-    const double hmacSha256Speed = mpw_show_speed( startTime, iterations, "hmac-sha-256" );
+    const double hmacSha256Speed = spectre_show_speed( startTime, iterations, "hmac-sha-256" );
     free( (void *)userKey );
 
     // Start BCrypt
-    // Similar to phase-one of mpw
+    // Similar to phase-one of spectre
     uint8_t bcrypt_rounds = 9;
     iterations = 170; /* tuned to ~10s on dev machine */
-    mpw_time( &startTime );
+    spectre_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
         bcrypt( userSecret, bcrypt_gensalt( bcrypt_rounds ) );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
             fprintf( stderr, "\rbcrypt (rounds 10^%d): iteration %d / %d (%.0f%%)..", bcrypt_rounds, i, iterations, percent );
     }
-    const double bcrypt9Speed = mpw_show_speed( startTime, iterations, "bcrypt" );
+    const double bcrypt9Speed = spectre_show_speed( startTime, iterations, "bcrypt" );
 
     // Start SCrypt
-    // Phase one of mpw
+    // Phase one of spectre
     iterations = 50; /* tuned to ~10s on dev machine */
-    mpw_time( &startTime );
+    spectre_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
-        free( (void *)mpw_user_key( userName, userSecret, MPAlgorithmVersionCurrent ) );
+        free( (void *)spectre_user_key( userName, userSecret, SpectreAlgorithmCurrent ) );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
-            fprintf( stderr, "\rscrypt_mpw: iteration %d / %d (%.0f%%)..", i, iterations, percent );
+            fprintf( stderr, "\rscrypt_spectre: iteration %d / %d (%.0f%%)..", i, iterations, percent );
     }
-    const double scryptSpeed = mpw_show_speed( startTime, iterations, "scrypt_mpw" );
+    const double scryptSpeed = spectre_show_speed( startTime, iterations, "scrypt_spectre" );
 
-    // Start MPW
-    // Both phases of mpw
+    // Start SPECTRE
+    // Both phases of spectre
     iterations = 50; /* tuned to ~10s on dev machine */
-    mpw_time( &startTime );
+    spectre_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
-        userKey = mpw_user_key( userName, userSecret, MPAlgorithmVersionCurrent );
+        userKey = spectre_user_key( userName, userSecret, SpectreAlgorithmCurrent );
         if (!userKey) {
             ftl( "Could not allocate user key: %s", strerror( errno ) );
             break;
         }
 
-        free( (void *)mpw_site_result(
+        free( (void *)spectre_site_result(
                 userKey, siteName, resultType, NULL, keyCounter, keyPurpose, keyContext ) );
         free( (void *)userKey );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
-            fprintf( stderr, "\rmpw: iteration %d / %d (%.0f%%)..", i, iterations, percent );
+            fprintf( stderr, "\rspectre: iteration %d / %d (%.0f%%)..", i, iterations, percent );
     }
-    const double mpwSpeed = mpw_show_speed( startTime, iterations, "mpw" );
+    const double spectreSpeed = spectre_show_speed( startTime, iterations, "spectre" );
 
     // Summarize.
     fprintf( stdout, "\n== SUMMARY ==\nOn this machine,\n" );
-    fprintf( stdout, " - mpw is %f times slower than hmac-sha-256.\n", hmacSha256Speed / mpwSpeed );
-    fprintf( stdout, " - mpw is %f times slower than bcrypt (rounds 10^%d).\n", bcrypt9Speed / mpwSpeed, bcrypt_rounds );
+    fprintf( stdout, " - spectre is %f times slower than hmac-sha-256.\n", hmacSha256Speed / spectreSpeed );
+    fprintf( stdout, " - spectre is %f times slower than bcrypt (rounds 10^%d).\n", bcrypt9Speed / spectreSpeed, bcrypt_rounds );
     fprintf( stdout, " - scrypt is %f times slower than bcrypt (rounds 10^%d).\n", bcrypt9Speed / scryptSpeed, bcrypt_rounds );
 
     return 0;

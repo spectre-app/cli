@@ -4,4 +4,4 @@
 set -e
 cd "${BASH_SOURCE%/*}"
 
-rm -vfr mpw mpw-bench mpw-tests
+rm -vfr spectre spectre-bench spectre-tests

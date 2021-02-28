@@ -5,7 +5,7 @@ set -e
 cd "${BASH_SOURCE%/*}"
 source bashlib
 
-inf "This will install the mpw tool."
+inf "This will install the spectre tool."
 
 # Try to guess then ask for the bin dir to install to.
 IFS=: read -a paths <<< "$PATH"
@@ -23,42 +23,42 @@ bindir=$(ask -d "$bindir" "What bin directory should I install to?")
 [[ -w "$bindir" ]] || ftl 'Cannot write to bin directory: %s' "$bindir" || exit
 
 # Install Spectre.
-install -m555 mpw "$bindir"
+install -m555 spectre "$bindir"
 [[ ! -e "$bindir/bashlib" ]] && install bashlib "$bindir" ||:
 
 # Convenience bash function.
 inf "Installation successful!"
 echo
 
-inf "To improve usability, you can install an mpw function in your bash shell."
+inf "To improve usability, you can install an spectre function in your bash shell."
 inf "This function adds the following features:"
 inf "  - Automatically remember your user name in the shell if not set."
 inf "  - Automatically put the password in the clipboard (some platforms)."
 echo
-inf "To do this you need the following function in ~/.bashrc:\n%s" "$(<mpw.bashrc)"
+inf "To do this you need the following function in ~/.bashrc:\n%s" "$(<spectre.bashrc)"
 echo
 inf "We can do this for you automatically now."
-if ask -c Y!n "Append the mpw function to your .bashrc?"; then
-    cat mpw.bashrc >> ~/.bashrc
+if ask -c Y!n "Append the spectre function to your .bashrc?"; then
+    cat spectre.bashrc >> ~/.bashrc
     inf "Done!  Don't forget to run '%s' to apply the changes!" "source ~/.bashrc"
 fi
 echo
 
 inf "You can also save your user name in ~/.bashrc.  Leave blank to skip this step."
-if MPW_USERNAME=$(ask "Your full name:") && [[ $MPW_USERNAME ]] ; then
-    printf 'export MPW_USERNAME=%q\n' "$MPW_USERNAME" >> ~/.bashrc
+if SPECTRE_USERNAME=$(ask "Your full name:") && [[ $SPECTRE_USERNAME ]] ; then
+    printf 'export SPECTRE_USERNAME=%q\n' "$SPECTRE_USERNAME" >> ~/.bashrc
 fi
 inf "If you have an askpass program you'd like to use, you can specify it here."
 inf "An askpass program provides a graphical interface for entering things like your personal secret."
 inf "Leave blank to skip this step and enter passwords using the terminal."
-if [[ ! $MPW_ASKPASS ]] && hash ssh-askpass 2>/dev/null; then
-    MPW_ASKPASS=ssh-askpass
+if [[ ! $SPECTRE_ASKPASS ]] && hash ssh-askpass 2>/dev/null; then
+    SPECTRE_ASKPASS=ssh-askpass
 fi
-if MPW_ASKPASS=$(ask +"$MPW_ASKPASS" "askpass program:") && [[ $MPW_ASKPASS ]] ; then
-    printf 'export MPW_ASKPASS=%q\n' "$MPW_ASKPASS" >> ~/.bashrc
+if SPECTRE_ASKPASS=$(ask +"$SPECTRE_ASKPASS" "askpass program:") && [[ $SPECTRE_ASKPASS ]] ; then
+    printf 'export SPECTRE_ASKPASS=%q\n' "$SPECTRE_ASKPASS" >> ~/.bashrc
 fi
 echo
 
 inf "Shell features installed."
 inf "To load these convenience features into your already running shell, type: source ~/.bashrc"
-inf "To begin using Spectre, type: mpw -h or mpw my-site-name"
+inf "To begin using Spectre, type: spectre -h or spectre my-site-name"

@@ -24,18 +24,18 @@
 #include <unistd.h>
 #include <sysexits.h>
 
-#ifndef mpw_log_do
-#define mpw_log_do(level, format, ...) ({ \
+#ifndef spectre_log_do
+#define spectre_log_do(level, format, ...) ({ \
     fprintf( stderr, format "\n", ##__VA_ARGS__ ); \
     if (level == ftl_level) \
         abort(); \
 })
 #endif
 
-#include "mpw-algorithm.h"
-#include "mpw-util.h"
+#include "spectre-algorithm.h"
+#include "spectre-util.h"
 
-#include "mpw-tests-util.h"
+#include "spectre-tests-util.h"
 
 /** Output the program's usage documentation. */
 static void usage() {
@@ -43,10 +43,10 @@ static void usage() {
     inf( ""
             "  Spectre v%s - Tests\n"
             "--------------------------------------------------------------------------------\n"
-            "      https://spectre.app\n", stringify_def( MP_VERSION ) );
+            "      https://spectre.app\n", stringify_def( Spectre_VERSION ) );
     inf( ""
             "\nUSAGE\n\n"
-            "  mpw-tests [-v|-q]* [-h] [test-name ...]\n" );
+            "  spectre-tests [-v|-q]* [-h] [test-name ...]\n" );
     inf( ""
             "  -v           Increase output verbosity (can be repeated).\n"
             "  -q           Decrease output verbosity (can be repeated).\n" );
@@ -60,13 +60,13 @@ static void usage() {
 int main(int argc, char *const argv[]) {
 
     for (int opt; (opt = getopt( argc, argv, "vqh" )) != EOF;
-         optarg? mpw_zero( optarg, strlen( optarg ) ): (void)0)
+         optarg? spectre_zero( optarg, strlen( optarg ) ): (void)0)
         switch (opt) {
             case 'v':
-                ++mpw_verbosity;
+                ++spectre_verbosity;
                 break;
             case 'q':
-                --mpw_verbosity;
+                --spectre_verbosity;
                 break;
             case 'h':
                 usage();
@@ -81,9 +81,9 @@ int main(int argc, char *const argv[]) {
 
     int failedTests = 0;
 
-    xmlNodePtr tests = xmlDocGetRootElement( xmlParseFile( "mpw_tests.xml" ) );
+    xmlNodePtr tests = xmlDocGetRootElement( xmlParseFile( "spectre_tests.xml" ) );
     if (!tests) {
-        ftl( "Couldn't find test case: mpw_tests.xml" );
+        ftl( "Couldn't find test case: spectre_tests.xml" );
         abort();
     }
 
@@ -92,20 +92,20 @@ int main(int argc, char *const argv[]) {
             continue;
 
         // Read in the test case.
-        xmlChar *id = mpw_xmlTestCaseString( testCase, "id" );
-        MPAlgorithmVersion algorithm = (MPAlgorithmVersion)mpw_xmlTestCaseInteger( testCase, "algorithm" );
-        xmlChar *userName = mpw_xmlTestCaseString( testCase, "userName" );
-        xmlChar *userSecret = mpw_xmlTestCaseString( testCase, "userSecret" );
-        MPKeyID keyID = mpw_id_str( (char *)mpw_xmlTestCaseString( testCase, "keyID" ) );
-        xmlChar *siteName = mpw_xmlTestCaseString( testCase, "siteName" );
-        MPCounterValue keyCounter = (MPCounterValue)mpw_xmlTestCaseInteger( testCase, "keyCounter" );
-        xmlChar *resultTypeString = mpw_xmlTestCaseString( testCase, "resultType" );
-        xmlChar *keyPurposeString = mpw_xmlTestCaseString( testCase, "keyPurpose" );
-        xmlChar *keyContext = mpw_xmlTestCaseString( testCase, "keyContext" );
-        xmlChar *result = mpw_xmlTestCaseString( testCase, "result" );
+        xmlChar *id = spectre_xmlTestCaseString( testCase, "id" );
+        SpectreAlgorithm algorithm = (SpectreAlgorithm)spectre_xmlTestCaseInteger( testCase, "algorithm" );
+        xmlChar *userName = spectre_xmlTestCaseString( testCase, "userName" );
+        xmlChar *userSecret = spectre_xmlTestCaseString( testCase, "userSecret" );
+        SpectreKeyID keyID = spectre_id_str( (char *)spectre_xmlTestCaseString( testCase, "keyID" ) );
+        xmlChar *siteName = spectre_xmlTestCaseString( testCase, "siteName" );
+        SpectreCounter keyCounter = (SpectreCounter)spectre_xmlTestCaseInteger( testCase, "keyCounter" );
+        xmlChar *resultTypeString = spectre_xmlTestCaseString( testCase, "resultType" );
+        xmlChar *keyPurposeString = spectre_xmlTestCaseString( testCase, "keyPurpose" );
+        xmlChar *keyContext = spectre_xmlTestCaseString( testCase, "keyContext" );
+        xmlChar *result = spectre_xmlTestCaseString( testCase, "result" );
 
-        MPResultType resultType = mpw_type_named( (char *)resultTypeString );
-        MPKeyPurpose keyPurpose = mpw_purpose_named( (char *)keyPurposeString );
+        SpectreResultType resultType = spectre_type_named( (char *)resultTypeString );
+        SpectreKeyPurpose keyPurpose = spectre_purpose_named( (char *)keyPurposeString );
 
         // Run the test case.
         do {
@@ -125,7 +125,7 @@ int main(int argc, char *const argv[]) {
             }
 
             // 1. calculate the user key.
-            const MPUserKey *userKey = mpw_user_key(
+            const SpectreUserKey *userKey = spectre_user_key(
                     (char *)userName, (char *)userSecret, algorithm );
             if (!userKey) {
                 ftl( "Couldn't derive user key." );
@@ -133,16 +133,16 @@ int main(int argc, char *const argv[]) {
             }
 
             // Check the user key.
-            if (!mpw_id_equals( &keyID, &userKey->keyID )) {
+            if (!spectre_id_equals( &keyID, &userKey->keyID )) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", userKey->keyID.hex, keyID.hex );
                 continue;
             }
 
             // 2. calculate the site password.
-            const char *testResult = mpw_site_result(
+            const char *testResult = spectre_site_result(
                     userKey, (char *)siteName, resultType, NULL, keyCounter, keyPurpose, (char *)keyContext );
-            mpw_free( &userKey, sizeof( *userKey ) );
+            spectre_free( &userKey, sizeof( *userKey ) );
             if (!testResult) {
                 ftl( "Couldn't derive site password." );
                 continue;
@@ -152,10 +152,10 @@ int main(int argc, char *const argv[]) {
             if (xmlStrcmp( result, BAD_CAST testResult ) != 0) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (result: got %s != expected %s)\n", testResult, result );
-                mpw_free_string( &testResult );
+                spectre_free_string( &testResult );
                 continue;
             }
-            mpw_free_string( &testResult );
+            spectre_free_string( &testResult );
 
             fprintf( stdout, "pass.\n" );
         } while(false);

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 source bashcomplib
 
-# completing the 'mpw' command.
-_comp_mpw() {
+# completing the 'spectre' command.
+_comp_spectre() {
     local optarg= cword=${COMP_WORDS[COMP_CWORD]} pcword=
     (( COMP_CWORD )) && pcword=${COMP_WORDS[COMP_CWORD - 1]} 
 
     case $pcword in
         -u) # complete user names.
-            COMPREPLY=( ~/.mpw.d/*.mpsites )
+            COMPREPLY=( ~/.spectre.d/*.mpsites )
             [[ -e $COMPREPLY ]] || COMPREPLY=()
             COMPREPLY=( "${COMPREPLY[@]##*/}" ) COMPREPLY=( "${COMPREPLY[@]%.mpsites}" )
             ;;
@@ -35,8 +35,8 @@ _comp_mpw() {
                 for (( w = 0; w < ${#COMP_WORDS[@]}; ++w )); do
                     [[ ${COMP_WORDS[w]} = -u ]] && userName=$(xargs <<< "${COMP_WORDS[w + 1]}") && break
                 done
-                if [[ -e ~/.mpw.d/"$userName.mpsites" ]]; then
-                    IFS=$'\n' read -d '' -ra COMPREPLY < <(awk -F$'\t' '!/^ *#/{sub(/^ */, "", $2); print $2}' ~/.mpw.d/"$userName.mpsites")
+                if [[ -e ~/.spectre.d/"$userName.mpsites" ]]; then
+                    IFS=$'\n' read -d '' -ra COMPREPLY < <(awk -F$'\t' '!/^ *#/{sub(/^ */, "", $2); print $2}' ~/.spectre.d/"$userName.mpsites")
                     printf -v _comp_title 'Sites for %s' "$userName"
                 else
                     # Default list from the Alexa Top 500
@@ -65,5 +65,5 @@ _comp_mpw() {
     _comp_finish_completions
 }
 
-#complete -F _show_args mpw
-complete -o nospace -F _comp_mpw mpw
+#complete -F _show_args spectre
+complete -o nospace -F _comp_spectre spectre

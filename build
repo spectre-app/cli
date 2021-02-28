@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # USAGE
-#   [targets='...'] [mpw_feature=0|1 ...] [CFLAGS='...'] [LDFLAGS='...'] ./build [-v|-d|-h|--] [cc arguments ...]
+#   [targets='...'] [spectre_feature=0|1 ...] [CFLAGS='...'] [LDFLAGS='...'] ./build [-v|-d|-h|--] [cc arguments ...]
 #
 #   By default, you should only need to run ./build
 #
@@ -10,7 +10,7 @@
 #   -h: show this usage information.
 #
 #   You can customize the targets that are built using targets='...'. Use targets='all' to build all targets.
-#   By default, we only build the 'mpw' target.  
+#   By default, we only build the 'spectre' target.  
 #   See targets_all for all possible targets as well as the features they support and require.
 #
 #   Several features can be enabled or disabled using feature flags.
@@ -45,18 +45,18 @@ shift "$(( OPTIND - 1 ))"
 
 # Targets to build
 targets_all=(
-    mpw                     # C CLI version of Spectre (needs: mpw_sodium, optional: mpw_color, mpw_json).
-    mpw-bench               # C CLI Spectre benchmark utility (needs: mpw_sodium).
-    mpw-tests               # C Spectre algorithm test suite (needs: mpw_sodium, mpw_xml).
+    spectre                     # C CLI version of Spectre (needs: spectre_sodium, optional: spectre_color, spectre_json).
+    spectre-bench               # C CLI Spectre benchmark utility (needs: spectre_sodium).
+    spectre-tests               # C Spectre algorithm test suite (needs: spectre_sodium, spectre_xml).
 )
-targets_default='mpw'       # Override with: targets='...' ./build
+targets_default='spectre'       # Override with: targets='...' ./build
 targets=${targets[*]:-$targets_default} 
 
 # Features
-mpw_sodium=${mpw_sodium:-1} # Implement crypto functions with sodium (depends on libsodium).
-mpw_json=${mpw_json:-1}     # Support JSON-based user configuration format (depends on libjson-c).
-mpw_color=${mpw_color:-1}   # Colorized identicon (depends on libncurses).
-mpw_xml=${mpw_xml:-1}       # XML parsing (depends on libxml2).
+spectre_sodium=${spectre_sodium:-1} # Implement crypto functions with sodium (depends on libsodium).
+spectre_json=${spectre_json:-1}     # Support JSON-based user configuration format (depends on libjson-c).
+spectre_color=${spectre_color:-1}   # Colorized identicon (depends on libncurses).
+spectre_xml=${spectre_xml:-1}       # XML parsing (depends on libxml2).
 
 # Default build flags
 cflags=( -O3 $CFLAGS ); unset CFLAGS
@@ -66,32 +66,32 @@ if (( debug )); then
 fi
 
 # Version
-if { mpw_version=$(git describe --match '*-cli*' --long --dirty) || mpw_version=$(<VERSION); } 2>/dev/null; then
-    cflags+=( -D"MP_VERSION=$mpw_version" )
+if { spectre_version=$(git describe --match '*-cli*' --long --dirty) || spectre_version=$(<VERSION); } 2>/dev/null; then
+    cflags+=( -D"MP_VERSION=$spectre_version" )
 fi
-echo "Current mpw source version ${mpw_version:-<unknown>}..."
+echo "Current spectre source version ${spectre_version:-<unknown>}..."
 
 # Meta
 if (( verbose )); then
-    echo "mpw_sodium=${mpw_sodium}, mpw_json=${mpw_json}, mpw_color=${mpw_color}, mpw_xml=${mpw_xml}"
+    echo "spectre_sodium=${spectre_sodium}, spectre_json=${spectre_json}, spectre_color=${spectre_color}, spectre_xml=${spectre_xml}"
     echo "CFLAGS: ${cflags[*]}"
     echo "LDFLAGS: ${ldflags[*]}"
     echo "targets: ${targets[*]}"
 fi
 
 
-### TARGET: MPW
-mpw() {
+### TARGET: SPECTRE
+spectre() {
     # dependencies
-    use_mpw_sodium required
-    use_mpw_color optional
-    use_mpw_json optional
+    use_spectre_sodium required
+    use_spectre_color optional
+    use_spectre_json optional
 
     # target
     cflags=(
         "${cflags[@]}"
 
-        # mpw paths
+        # spectre paths
         -I"api/c" -I"src"
     )
     ldflags=(
@@ -100,24 +100,24 @@ mpw() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c" \
-       "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c" \
-       "api/c/mpw-types.c" "api/c/mpw-util.c" "api/c/mpw-marshal-util.c" "api/c/mpw-marshal.c" "src/mpw-cli-util.c" \
-       "${ldflags[@]}" "src/mpw-cli.c" -o "mpw"
-    echo "done!  You can now run ./mpw-cli-tests, ./install or use ./$_"
+       "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c" \
+       "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c" \
+       "api/c/spectre-types.c" "api/c/spectre-util.c" "api/c/spectre-marshal-util.c" "api/c/spectre-marshal.c" "src/spectre-cli-util.c" \
+       "${ldflags[@]}" "src/spectre-cli.c" -o "spectre"
+    echo "done!  You can now run ./spectre-cli-tests, ./install or use ./$_"
 }
 
 
-### TARGET: MPW-BENCH
-mpw-bench() {
+### TARGET: SPECTRE-BENCH
+spectre-bench() {
     # dependencies
-    use_mpw_sodium required
+    use_spectre_sodium required
 
     # target
     cflags=(
         "${cflags[@]}"
 
-        # mpw paths
+        # spectre paths
         -I"api/c" -I"src"
     )
     ldflags=(
@@ -126,25 +126,25 @@ mpw-bench() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c" \
-       "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c" \
-       "api/c/mpw-types.c" "api/c/mpw-util.c" \
-       "${ldflags[@]}" "src/mpw-bench.c" -o "mpw-bench"
+       "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c" \
+       "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c" \
+       "api/c/spectre-types.c" "api/c/spectre-util.c" \
+       "${ldflags[@]}" "src/spectre-bench.c" -o "spectre-bench"
     echo "done!  You can now use ./$_"
 }
 
 
-### TARGET: MPW-TESTS
-mpw-tests() {
+### TARGET: SPECTRE-TESTS
+spectre-tests() {
     # dependencies
-    use_mpw_sodium required
-    use_mpw_xml required
+    use_spectre_sodium required
+    use_spectre_xml required
 
     # target
     cflags=(
         "${cflags[@]}"
 
-        # mpw paths
+        # spectre paths
         -I"api/c" -I"src"
     )
     ldflags=(
@@ -153,10 +153,10 @@ mpw-tests() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "api/c/base64.c" "api/c/aes.c" "api/c/mpw-algorithm.c" \
-       "api/c/mpw-algorithm_v0.c" "api/c/mpw-algorithm_v1.c" "api/c/mpw-algorithm_v2.c" "api/c/mpw-algorithm_v3.c" \
-       "api/c/mpw-types.c" "api/c/mpw-util.c" "src/mpw-tests-util.c" \
-       "${ldflags[@]}" "src/mpw-tests.c" -o "mpw-tests"
+       "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c" \
+       "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c" \
+       "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-tests-util.c" \
+       "${ldflags[@]}" "src/spectre-tests.c" -o "spectre-tests"
     echo "done!  You can now use ./$_"
 }
 
@@ -213,21 +213,21 @@ use() {
         return 1
     fi
 }
-use_mpw_sodium() {
+use_spectre_sodium() {
     local requisite=$1
-    use mpw_sodium "$requisite" sodium && cflags+=( -D"MPW_SODIUM=1" ) ||:
+    use spectre_sodium "$requisite" sodium && cflags+=( -D"SPECTRE_SODIUM=1" ) ||:
 }
-use_mpw_color() {
+use_spectre_color() {
     local requisite=$1
-    use mpw_color "$requisite" curses tinfo && cflags+=( -D"MPW_COLOR=1" ) ||:
+    use spectre_color "$requisite" curses tinfo && cflags+=( -D"SPECTRE_COLOR=1" ) ||:
 }
-use_mpw_json() {
+use_spectre_json() {
     local requisite=$1
-    use mpw_json "$requisite" json-c && cflags+=( -D"MPW_JSON=1" ) ||:
+    use spectre_json "$requisite" json-c && cflags+=( -D"SPECTRE_JSON=1" ) ||:
 }
-use_mpw_xml() {
+use_spectre_xml() {
     local requisite=$1
-    use mpw_xml "$requisite" xml2 && cflags+=( $(xml2-config --cflags) ) ldflags+=( $(xml2-config --libs) ) ||:
+    use spectre_xml "$requisite" xml2 && cflags+=( $(xml2-config --cflags) ) ldflags+=( $(xml2-config --libs) ) ||:
 }
 
 

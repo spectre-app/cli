@@ -17,7 +17,7 @@
 //==============================================================================
 
 //
-//  mpw-tests-util.h
+//  spectre-tests-util.h
 //  Spectre
 //
 //  Created by Maarten Billemont on 2014-12-21.
@@ -26,9 +26,9 @@
 
 #include <libxml/parser.h>
 
-xmlNodePtr mpw_xmlTestCaseNode(
+xmlNodePtr spectre_xmlTestCaseNode(
         xmlNodePtr testCaseNode, const char *nodeName);
-xmlChar *mpw_xmlTestCaseString(
+xmlChar *spectre_xmlTestCaseString(
         xmlNodePtr context, const char *nodeName);
-uint32_t mpw_xmlTestCaseInteger(
+uint32_t spectre_xmlTestCaseInteger(
         xmlNodePtr context, const char *nodeName);

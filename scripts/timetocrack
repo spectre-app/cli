@@ -43,8 +43,8 @@ w="@words.txt"
 #hardwareName='AntMiner S9 (SHA256 @ 20M$)'         hardwareSpeed='14T * 20M / 1288'
 #hardwareName='AntMiner S9 (SHA256 @ 5B$)'          hardwareSpeed='14T * 5B / 1288'
 
-# mpw-bench
-#hardwareName='2.3 GHz i7, 8GB (MPW)'               hardwareSpeed=7.46
+# spectre-bench
+#hardwareName='2.3 GHz i7, 8GB (SPECTRE)'               hardwareSpeed=7.46
 
 second='1'
 secondsInHour='3600'

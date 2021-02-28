@@ -25,11 +25,11 @@
 #include <errno.h>
 #include <sysexits.h>
 
-#include "mpw-cli-util.h"
-#include "mpw-algorithm.h"
-#include "mpw-util.h"
-#include "mpw-marshal.h"
-#include "mpw-marshal-util.h"
+#include "spectre-cli-util.h"
+#include "spectre-algorithm.h"
+#include "spectre-util.h"
+#include "spectre-marshal.h"
+#include "spectre-marshal-util.h"
 
 /** Output the program's usage documentation. */
 static void usage() {
@@ -37,17 +37,17 @@ static void usage() {
     inf( ""
          "  Spectre v%s - CLI\n"
          "--------------------------------------------------------------------------------\n"
-         "      https://spectre.app\n", stringify_def( MP_VERSION ) );
+         "      https://spectre.app\n", stringify_def( Spectre_VERSION ) );
     inf( ""
          "\nUSAGE\n\n"
-         "  mpw [-u|-U user-name] [-s fd] [-t pw-type] [-P value] [-c counter]\n"
+         "  spectre [-u|-U user-name] [-s fd] [-t pw-type] [-P value] [-c counter]\n"
          "      [-a version] [-p purpose] [-C context] [-f|F format] [-R 0|1]\n"
          "      [-v|-q]* [-n] [-h] [site-name]\n" );
     inf( ""
          "  -u user-name Specify the user name of the user.\n"
          "               -u checks the personal secret against the config,\n"
          "               -U allows updating to a new personal secret.\n"
-         "               Defaults to %s in env or prompts.\n", MP_ENV_userName );
+         "               Defaults to %s in env or prompts.\n", Spectre_ENV_userName );
     inf( ""
          "  -s fd        Read the personal secret of the user from a file descriptor.\n"
          "               Tip: don't send extra characters like newlines such as by using\n"
@@ -79,7 +79,7 @@ static void usage() {
     inf( ""
          "  -a version   The algorithm version to use, %d - %d.\n"
          "               Defaults to env var %s or %d.\n",
-            MPAlgorithmVersionFirst, MPAlgorithmVersionLast, MP_ENV_algorithm, MPAlgorithmVersionCurrent );
+            SpectreAlgorithmFirst, SpectreAlgorithmLast, Spectre_ENV_algorithm, SpectreAlgorithmCurrent );
     inf( ""
          "  -p purpose   The purpose of the generated token.\n"
          "               Defaults to 'auth'.\n"
@@ -98,10 +98,10 @@ static void usage() {
          "               -F reads & writes only the given format,\n"
          "               Defaults to env var %s or the default format (%s).\n"
          "                   n, none     | No file\n"
-         "                   f, flat     | ~/.mpw.d/user-name.%s\n"
-         "                   j, json     | ~/.mpw.d/user-name.%s\n",
-            mpw_format_name( MPMarshalFormatDefault ), MP_ENV_format, mpw_format_name( MPMarshalFormatDefault ),
-            mpw_format_extension( MPMarshalFormatFlat ), mpw_format_extension( MPMarshalFormatJSON ) );
+         "                   f, flat     | ~/.spectre.d/user-name.%s\n"
+         "                   j, json     | ~/.spectre.d/user-name.%s\n",
+            spectre_format_name( SpectreFormatDefault ), Spectre_ENV_format, spectre_format_name( SpectreFormatDefault ),
+            spectre_format_extension( SpectreFormatFlat ), spectre_format_extension( SpectreFormatJSON ) );
     inf( ""
          "  -R redacted  Whether to save the file in redacted format or not.\n"
          "               Redaction omits or encrypts any secrets, making the file safe\n"
@@ -122,7 +122,7 @@ static void usage() {
          "  %-12s The default algorithm version (see -a).\n"
          "  %-12s The default file format (see -f).\n"
          "  %-12s The askpass program to use for prompting the user.\n",
-            MP_ENV_userName, MP_ENV_algorithm, MP_ENV_format, MP_ENV_askpass );
+            Spectre_ENV_userName, Spectre_ENV_algorithm, Spectre_ENV_format, Spectre_ENV_askpass );
     exit( EX_OK );
 }
 
@@ -147,24 +147,24 @@ typedef struct {
     bool omitNewline;
     bool allowPasswordUpdate;
     bool fileFormatFixed;
-    MPMarshalFormat fileFormat;
+    SpectreFormat fileFormat;
     const char *filePath;
     const char *userName;
     const char *userSecret;
     const char *identicon;
     const char *siteName;
-    MPResultType resultType;
+    SpectreResultType resultType;
     const char *resultState;
     const char *resultParam;
     const char *resultPurpose;
-    MPCounterValue keyCounter;
-    MPKeyPurpose keyPurpose;
+    SpectreCounter keyCounter;
+    SpectreKeyPurpose keyPurpose;
     const char *keyContext;
-    MPAlgorithmVersion algorithm;
-    MPMarshalledFile *file;
-    MPMarshalledUser *user;
-    MPMarshalledSite *site;
-    MPMarshalledQuestion *question;
+    SpectreAlgorithm algorithm;
+    SpectreMarshalledFile *file;
+    SpectreMarshalledUser *user;
+    SpectreMarshalledSite *site;
+    SpectreMarshalledQuestion *question;
 } Operation;
 
 // Processing steps.
@@ -186,10 +186,10 @@ void cli_resultState(Arguments *args, Operation *operation);
 void cli_resultParam(Arguments *args, Operation *operation);
 void cli_algorithmVersion(Arguments *args, Operation *operation);
 void cli_fileRedacted(Arguments *args, Operation *operation);
-void cli_mpw(Arguments *args, Operation *operation);
+void cli_spectre(Arguments *args, Operation *operation);
 void cli_save(Arguments *args, Operation *operation);
 
-MPUserKeyProvider cli_userKeyProvider_op(Operation *operation);
+SpectreKeyProvider spectre_proxy_provider_set_operation(Operation *operation);
 
 /** ========================================================================
  *  MAIN                                                                     */
@@ -197,17 +197,17 @@ int main(const int argc, char *const argv[]) {
 
     // Application defaults.
     Arguments args = {
-            .userName = mpw_getenv( MP_ENV_userName ),
-            .algorithmVersion = mpw_getenv( MP_ENV_algorithm ),
-            .fileFormat = mpw_getenv( MP_ENV_format ),
+            .userName = spectre_getenv( Spectre_ENV_userName ),
+            .algorithmVersion = spectre_getenv( Spectre_ENV_algorithm ),
+            .fileFormat = spectre_getenv( Spectre_ENV_format ),
     };
     Operation operation = {
             .allowPasswordUpdate = false,
             .fileFormatFixed = false,
-            .fileFormat = MPMarshalFormatDefault,
-            .resultType = MPResultTypeDefaultResult,
-            .keyCounter = MPCounterValueDefault,
-            .keyPurpose = MPKeyPurposeAuthentication,
+            .fileFormat = SpectreFormatDefault,
+            .resultType = SpectreResultDefaultResult,
+            .keyCounter = SpectreCounterDefault,
+            .keyPurpose = SpectreKeyPurposeAuthentication,
     };
 
     // Read the command-line options.
@@ -240,22 +240,22 @@ int main(const int argc, char *const argv[]) {
     if (operation.file && operation.user) {
         dbg( "userName         : %s", operation.user->userName );
         dbg( "identicon        : %s", operation.identicon );
-        dbg( "fileFormat       : %s%s", mpw_format_name( operation.fileFormat ), operation.fileFormatFixed? " (fixed)": "" );
+        dbg( "fileFormat       : %s%s", spectre_format_name( operation.fileFormat ), operation.fileFormatFixed? " (fixed)": "" );
         dbg( "filePath         : %s", operation.filePath );
     }
     if (operation.site) {
         dbg( "siteName         : %s", operation.siteName );
-        dbg( "resultType       : %s (%u)", mpw_type_short_name( operation.resultType ), operation.resultType );
+        dbg( "resultType       : %s (%u)", spectre_type_short_name( operation.resultType ), operation.resultType );
         dbg( "resultParam      : %s", operation.resultParam );
         dbg( "keyCounter       : %u", operation.keyCounter );
-        dbg( "keyPurpose       : %s (%u)", mpw_purpose_name( operation.keyPurpose ), operation.keyPurpose );
+        dbg( "keyPurpose       : %s (%u)", spectre_purpose_name( operation.keyPurpose ), operation.keyPurpose );
         dbg( "keyContext       : %s", operation.keyContext );
         dbg( "algorithmVersion : %u", operation.algorithm );
     }
     dbg( "-----------------" );
 
     // Finally ready to perform the actual operation.
-    cli_mpw( NULL, &operation );
+    cli_spectre( NULL, &operation );
 
     // Save changes and clean up.
     cli_save( NULL, &operation );
@@ -267,77 +267,77 @@ int main(const int argc, char *const argv[]) {
 void cli_free(Arguments *args, Operation *operation) {
 
     if (args) {
-        mpw_free_strings( &args->userName, &args->userSecretFD, &args->userSecret, &args->siteName, NULL );
-        mpw_free_strings( &args->resultType, &args->resultParam, &args->keyCounter, &args->algorithmVersion, NULL );
-        mpw_free_strings( &args->keyPurpose, &args->keyContext, &args->fileFormat, &args->fileRedacted, NULL );
+        spectre_free_strings( &args->userName, &args->userSecretFD, &args->userSecret, &args->siteName, NULL );
+        spectre_free_strings( &args->resultType, &args->resultParam, &args->keyCounter, &args->algorithmVersion, NULL );
+        spectre_free_strings( &args->keyPurpose, &args->keyContext, &args->fileFormat, &args->fileRedacted, NULL );
     }
 
     if (operation) {
-        mpw_free_strings( &operation->userName, &operation->userSecret, &operation->siteName, NULL );
-        mpw_free_strings( &operation->keyContext, &operation->resultState, &operation->resultParam, NULL );
-        mpw_free_strings( &operation->identicon, &operation->filePath, NULL );
-        mpw_marshal_file_free( &operation->file );
-        mpw_marshal_user_free( &operation->user );
+        spectre_free_strings( &operation->userName, &operation->userSecret, &operation->siteName, NULL );
+        spectre_free_strings( &operation->keyContext, &operation->resultState, &operation->resultParam, NULL );
+        spectre_free_strings( &operation->identicon, &operation->filePath, NULL );
+        spectre_marshal_file_free( &operation->file );
+        spectre_marshal_user_free( &operation->user );
         operation->site = NULL;
         operation->question = NULL;
-        mpw_userKeyProvider_free();
+        spectre_proxy_provider_unset();
     }
 }
 
 void cli_args(Arguments *args, Operation *operation, const int argc, char *const argv[]) {
 
     for (int opt; (opt = getopt( argc, argv, "u:U:s:S:t:P:c:a:p:C:f:F:R:vqnh" )) != EOF;
-         optarg? mpw_zero( optarg, strlen( optarg ) ): (void)0)
+         optarg? spectre_zero( optarg, strlen( optarg ) ): (void)0)
         switch (opt) {
             case 'u':
-                args->userName = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->userName = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 operation->allowPasswordUpdate = false;
                 break;
             case 'U':
-                args->userName = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->userName = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 operation->allowPasswordUpdate = true;
                 break;
             case 's':
-                args->userSecretFD = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->userSecretFD = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'S':
                 // Passing your personal secret via the command-line is insecure.  Testing purposes only.
-                args->userSecret = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->userSecret = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 't':
-                args->resultType = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->resultType = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'P':
-                args->resultParam = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->resultParam = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'c':
-                args->keyCounter = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->keyCounter = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'a':
-                args->algorithmVersion = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->algorithmVersion = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'p':
-                args->keyPurpose = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->keyPurpose = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'C':
-                args->keyContext = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->keyContext = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'f':
-                args->fileFormat = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->fileFormat = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 operation->fileFormatFixed = false;
                 break;
             case 'F':
-                args->fileFormat = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->fileFormat = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 operation->fileFormatFixed = true;
                 break;
             case 'R':
-                args->fileRedacted = optarg && strlen( optarg )? mpw_strdup( optarg ): NULL;
+                args->fileRedacted = optarg && strlen( optarg )? spectre_strdup( optarg ): NULL;
                 break;
             case 'v':
-                ++mpw_verbosity;
+                ++spectre_verbosity;
                 break;
             case 'q':
-                --mpw_verbosity;
+                --spectre_verbosity;
                 break;
             case 'n':
                 operation->omitNewline = true;
@@ -366,19 +366,19 @@ void cli_args(Arguments *args, Operation *operation, const int argc, char *const
         }
 
     if (optind < argc && argv[optind])
-        args->siteName = mpw_strdup( argv[optind] );
+        args->siteName = spectre_strdup( argv[optind] );
 }
 
 void cli_userName(Arguments *args, Operation *operation) {
 
-    mpw_free_string( &operation->userName );
+    spectre_free_string( &operation->userName );
 
     if (args->userName)
-        operation->userName = mpw_strdup( args->userName );
+        operation->userName = spectre_strdup( args->userName );
 
     if (!operation->userName || !strlen( operation->userName ))
         do {
-            operation->userName = mpw_getline( "Your full name:" );
+            operation->userName = spectre_getline( "Your full name:" );
         } while (operation->userName && !strlen( operation->userName ));
 
     if (!operation->userName || !strlen( operation->userName )) {
@@ -390,20 +390,20 @@ void cli_userName(Arguments *args, Operation *operation) {
 
 void cli_userSecret(Arguments *args, Operation *operation) {
 
-    mpw_free_string( &operation->userSecret );
+    spectre_free_string( &operation->userSecret );
 
     if (args->userSecretFD) {
-        operation->userSecret = mpw_read_fd( (int)strtol( args->userSecretFD, NULL, 10 ) );
+        operation->userSecret = spectre_read_fd( (int)strtol( args->userSecretFD, NULL, 10 ) );
         if (!operation->userSecret && errno)
             wrn( "Error reading personal secret from FD %s: %s", args->userSecretFD, strerror( errno ) );
     }
 
     if (args->userSecret && !operation->userSecret)
-        operation->userSecret = mpw_strdup( args->userSecret );
+        operation->userSecret = spectre_strdup( args->userSecret );
 
     if (!operation->userSecret || !strlen( operation->userSecret ))
         do {
-            operation->userSecret = mpw_getpass( "Your personal secret: " );
+            operation->userSecret = spectre_getpass( "Your personal secret: " );
         } while (operation->userSecret && !strlen( operation->userSecret ));
 
     if (!operation->userSecret || !strlen( operation->userSecret )) {
@@ -415,12 +415,12 @@ void cli_userSecret(Arguments *args, Operation *operation) {
 
 void cli_siteName(Arguments *args, Operation *operation) {
 
-    mpw_free_string( &operation->siteName );
+    spectre_free_string( &operation->siteName );
 
     if (args->siteName)
-        operation->siteName = mpw_strdup( args->siteName );
+        operation->siteName = spectre_strdup( args->siteName );
     if (!operation->siteName)
-        operation->siteName = mpw_getline( "Site Domain:" );
+        operation->siteName = spectre_getline( "Site Domain:" );
 
     if (!operation->siteName) {
         ftl( "Missing site name." );
@@ -434,7 +434,7 @@ void cli_fileFormat(Arguments *args, Operation *operation) {
     if (!args->fileFormat)
         return;
 
-    operation->fileFormat = mpw_format_named( args->fileFormat );
+    operation->fileFormat = spectre_format_named( args->fileFormat );
     if (ERR == (int)operation->fileFormat) {
         ftl( "Invalid file format: %s", args->fileFormat );
         cli_free( args, operation );
@@ -447,7 +447,7 @@ void cli_keyPurpose(Arguments *args, Operation *operation) {
     if (!args->keyPurpose)
         return;
 
-    operation->keyPurpose = mpw_purpose_named( args->keyPurpose );
+    operation->keyPurpose = spectre_purpose_named( args->keyPurpose );
     if (ERR == (int)operation->keyPurpose) {
         ftl( "Invalid purpose: %s", args->keyPurpose );
         cli_free( args, operation );
@@ -460,22 +460,22 @@ void cli_keyContext(Arguments *args, Operation *operation) {
     if (!args->keyContext)
         return;
 
-    operation->keyContext = mpw_strdup( args->keyContext );
+    operation->keyContext = spectre_strdup( args->keyContext );
 }
 
-static FILE *cli_user_open(const MPMarshalFormat format, Operation *operation) {
+static FILE *cli_user_open(const SpectreFormat format, Operation *operation) {
 
     FILE *userFile = NULL;
     size_t count = 0;
-    const char **extensions = mpw_format_extensions( format, &count );
+    const char **extensions = spectre_format_extensions( format, &count );
     for (int e = 0; !userFile && e < count; ++e) {
-        mpw_free_string( &operation->filePath );
-        operation->filePath = mpw_path( operation->userName, extensions[e] );
+        spectre_free_string( &operation->filePath );
+        operation->filePath = spectre_path( operation->userName, extensions[e] );
 
         if (!operation->filePath || !(userFile = fopen( operation->filePath, "r" )))
             dbg( "Couldn't open configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
     }
-    mpw_free( &extensions, count * sizeof( *extensions ) );
+    spectre_free( &extensions, count * sizeof( *extensions ) );
 
     return userFile;
 }
@@ -485,63 +485,63 @@ void cli_user(Arguments *args, Operation *operation) {
     // Find the user's file from parameters.
     FILE *userFile = cli_user_open( operation->fileFormat, operation );
     if (!userFile && !operation->fileFormatFixed)
-        for (MPMarshalFormat format = MPMarshalFormatLast; !userFile && format >= MPMarshalFormatFirst; --format)
+        for (SpectreFormat format = SpectreFormatLast; !userFile && format >= SpectreFormatFirst; --format)
             userFile = cli_user_open( format, operation );
 
     if (!userFile) {
         // If no user from the user's file, create a new one.
-        mpw_free_string( &operation->filePath );
-        mpw_marshal_file_free( &operation->file );
-        mpw_marshal_user_free( &operation->user );
-        operation->file = mpw_marshal_file( NULL, NULL, NULL );
-        operation->user = mpw_marshal_user( operation->userName, cli_userKeyProvider_op( operation ), MPAlgorithmVersionCurrent );
+        spectre_free_string( &operation->filePath );
+        spectre_marshal_file_free( &operation->file );
+        spectre_marshal_user_free( &operation->user );
+        operation->file = spectre_marshal_file( NULL, NULL, NULL );
+        operation->user = spectre_marshal_user( operation->userName, spectre_proxy_provider_set_operation( operation ), SpectreAlgorithmCurrent );
     }
 
     else {
         // Load the user object from the user's file.
-        const char *fileInputData = mpw_read_file( userFile );
+        const char *fileInputData = spectre_read_file( userFile );
         if (!fileInputData || ferror( userFile ))
             wrn( "Error while reading configuration file:\n  %s: %d", operation->filePath, ferror( userFile ) );
         fclose( userFile );
 
         // Parse file.
-        mpw_marshal_file_free( &operation->file );
-        mpw_marshal_user_free( &operation->user );
-        operation->file = mpw_marshal_read( NULL, fileInputData );
-        if (operation->file && operation->file->error.type == MPMarshalSuccess) {
-            operation->user = mpw_marshal_auth( operation->file, cli_userKeyProvider_op( operation ) );
+        spectre_marshal_file_free( &operation->file );
+        spectre_marshal_user_free( &operation->user );
+        operation->file = spectre_marshal_read( NULL, fileInputData );
+        if (operation->file && operation->file->error.type == SpectreMarshalSuccess) {
+            operation->user = spectre_marshal_auth( operation->file, spectre_proxy_provider_set_operation( operation ) );
 
-            if (operation->file->error.type == MPMarshalErrorUserSecret && operation->allowPasswordUpdate) {
+            if (operation->file->error.type == SpectreMarshalErrorUserSecret && operation->allowPasswordUpdate) {
                 // Update personal secret in the user's file.
-                while (operation->file->error.type == MPMarshalErrorUserSecret) {
+                while (operation->file->error.type == SpectreMarshalErrorUserSecret) {
                     inf( "Given personal secret does not match configuration." );
                     inf( "To update the configuration with this new personal secret, first confirm the old personal secret." );
 
                     const char *importUserSecret = NULL;
                     while (!importUserSecret || !strlen( importUserSecret )) {
-                        mpw_free_string( &importUserSecret );
-                        importUserSecret = mpw_getpass( "Old personal secret: " );
+                        spectre_free_string( &importUserSecret );
+                        importUserSecret = spectre_getpass( "Old personal secret: " );
                     }
 
-                    mpw_marshal_user_free( &operation->user );
-                    operation->user = mpw_marshal_auth( operation->file, mpw_userKeyProvider_str( importUserSecret ) );
+                    spectre_marshal_user_free( &operation->user );
+                    operation->user = spectre_marshal_auth( operation->file, spectre_proxy_provider_set_secret( importUserSecret ) );
                     if (operation->file && operation->user)
-                        operation->user->userKeyProvider = cli_userKeyProvider_op( operation );
-                    mpw_free_string( &importUserSecret );
+                        operation->user->userKeyProvider = spectre_proxy_provider_set_operation( operation );
+                    spectre_free_string( &importUserSecret );
                 }
             }
         }
-        mpw_free_string( &fileInputData );
+        spectre_free_string( &fileInputData );
 
         // Incorrect personal secret.
-        if (operation->file->error.type == MPMarshalErrorUserSecret) {
+        if (operation->file->error.type == SpectreMarshalErrorUserSecret) {
             ftl( "Incorrect personal secret according to configuration:\n  %s: %s", operation->filePath, operation->file->error.message );
             cli_free( args, operation );
             exit( EX_DATAERR );
         }
 
         // Any other parse error.
-        if (!operation->file || !operation->user || operation->file->error.type != MPMarshalSuccess) {
+        if (!operation->file || !operation->user || operation->file->error.type != SpectreMarshalSuccess) {
             err( "Couldn't parse configuration file:\n  %s: %s", operation->filePath, operation->file->error.message );
             cli_free( args, operation );
             exit( EX_DATAERR );
@@ -549,9 +549,9 @@ void cli_user(Arguments *args, Operation *operation) {
     }
 
     if (operation->userSecret)
-        operation->user->identicon = mpw_identicon( operation->user->userName, operation->userSecret );
-    mpw_free_string( &operation->identicon );
-    operation->identicon = mpw_identicon_render( operation->user->identicon );
+        operation->user->identicon = spectre_identicon( operation->user->userName, operation->userSecret );
+    spectre_free_string( &operation->identicon );
+    operation->identicon = spectre_identicon_render( operation->user->identicon );
 }
 
 void cli_site(Arguments *args, Operation *operation) {
@@ -560,15 +560,15 @@ void cli_site(Arguments *args, Operation *operation) {
         abort();
 
     // Load the site object from the user's file.
-    MPMarshalledUser *user = operation->user;
+    SpectreMarshalledUser *user = operation->user;
     for (size_t s = 0; !operation->site && s < user->sites_count; ++s)
         if (strcmp( operation->siteName, (&user->sites[s])->siteName ) == OK)
             operation->site = &user->sites[s];
 
     // If no site from the user's file, create a new one.
     if (!operation->site)
-        operation->site = mpw_marshal_site(
-                user, operation->siteName, user->defaultType, MPCounterValueDefault, user->algorithm );
+        operation->site = spectre_marshal_site(
+                user, operation->siteName, user->defaultType, SpectreCounterDefault, user->algorithm );
 }
 
 void cli_question(Arguments *args, Operation *operation) {
@@ -578,10 +578,10 @@ void cli_question(Arguments *args, Operation *operation) {
 
     // Load the question object from the user's file.
     switch (operation->keyPurpose) {
-        case MPKeyPurposeAuthentication:
-        case MPKeyPurposeIdentification:
+        case SpectreKeyPurposeAuthentication:
+        case SpectreKeyPurposeIdentification:
             break;
-        case MPKeyPurposeRecovery:
+        case SpectreKeyPurposeRecovery:
             for (size_t q = 0; !operation->question && q < operation->site->questions_count; ++q)
                 if (operation->keyContext == (&operation->site->questions[q])->keyword ||
                     (!operation->keyContext && !strlen( (&operation->site->questions[q])->keyword )) ||
@@ -592,7 +592,7 @@ void cli_question(Arguments *args, Operation *operation) {
 
             // If no question from the user's file, create a new one.
             if (!operation->question)
-                operation->question = mpw_marshal_question( operation->site, operation->keyContext );
+                operation->question = spectre_marshal_question( operation->site, operation->keyContext );
             break;
     }
 }
@@ -603,19 +603,19 @@ void cli_resultType(Arguments *args, Operation *operation) {
         abort();
 
     switch (operation->keyPurpose) {
-        case MPKeyPurposeAuthentication: {
+        case SpectreKeyPurposeAuthentication: {
             operation->resultPurpose = "site password";
             operation->resultType = operation->site->resultType;
             operation->algorithm = operation->site->algorithm;
             break;
         }
-        case MPKeyPurposeIdentification: {
+        case SpectreKeyPurposeIdentification: {
             operation->resultPurpose = "site login";
             operation->resultType = operation->site->loginType;
             operation->algorithm = operation->site->algorithm;
             break;
         }
-        case MPKeyPurposeRecovery: {
+        case SpectreKeyPurposeRecovery: {
             operation->resultPurpose = "site answer";
             operation->resultType = operation->question->type;
             operation->algorithm = operation->site->algorithm;
@@ -626,22 +626,22 @@ void cli_resultType(Arguments *args, Operation *operation) {
     if (!args->resultType)
         return;
 
-    operation->resultType = mpw_type_named( args->resultType );
+    operation->resultType = spectre_type_named( args->resultType );
     if (ERR == (int)operation->resultType) {
         ftl( "Invalid type: %s", args->resultType );
         cli_free( args, operation );
         exit( EX_USAGE );
     }
 
-    if (!(operation->resultType & MPSiteFeatureAlternative)) {
+    if (!(operation->resultType & SpectreResultFeatureAlternate)) {
         switch (operation->keyPurpose) {
-            case MPKeyPurposeAuthentication:
+            case SpectreKeyPurposeAuthentication:
                 operation->site->resultType = operation->resultType;
                 break;
-            case MPKeyPurposeIdentification:
+            case SpectreKeyPurposeIdentification:
                 operation->site->loginType = operation->resultType;
                 break;
-            case MPKeyPurposeRecovery:
+            case SpectreKeyPurposeRecovery:
                 operation->question->type = operation->resultType;
                 break;
         }
@@ -654,33 +654,33 @@ void cli_resultState(Arguments *args, Operation *operation) {
         abort();
 
     switch (operation->keyPurpose) {
-        case MPKeyPurposeAuthentication: {
-            operation->resultState = operation->site->resultState? mpw_strdup( operation->site->resultState ): NULL;
+        case SpectreKeyPurposeAuthentication: {
+            operation->resultState = operation->site->resultState? spectre_strdup( operation->site->resultState ): NULL;
             operation->keyCounter = operation->site->counter;
             break;
         }
-        case MPKeyPurposeIdentification: {
-            if (operation->resultType != MPResultTypeNone) {
-                operation->resultState = operation->site->loginState? mpw_strdup( operation->site->loginState ): NULL;
-                operation->keyCounter = MPCounterValueInitial;
+        case SpectreKeyPurposeIdentification: {
+            if (operation->resultType != SpectreResultNone) {
+                operation->resultState = operation->site->loginState? spectre_strdup( operation->site->loginState ): NULL;
+                operation->keyCounter = SpectreCounterInitial;
             }
             else {
                 // Identification at site-level is none, fall back to user-level.
                 operation->resultPurpose = "global login";
-                mpw_free_string( &operation->siteName );
-                operation->siteName = mpw_strdup( operation->user->userName );
+                spectre_free_string( &operation->siteName );
+                operation->siteName = spectre_strdup( operation->user->userName );
                 operation->resultType = operation->user->loginType;
-                operation->resultState = operation->user->loginState? mpw_strdup( operation->user->loginState ): NULL;
-                operation->keyCounter = MPCounterValueInitial;
+                operation->resultState = operation->user->loginState? spectre_strdup( operation->user->loginState ): NULL;
+                operation->keyCounter = SpectreCounterInitial;
                 operation->algorithm = operation->user->algorithm;
             }
             break;
         }
-        case MPKeyPurposeRecovery: {
-            operation->resultState = operation->question->state? mpw_strdup( operation->question->state ): NULL;
-            operation->keyCounter = MPCounterValueInitial;
-            mpw_free_string( &operation->keyContext );
-            operation->keyContext = operation->question->keyword? mpw_strdup( operation->question->keyword ): NULL;
+        case SpectreKeyPurposeRecovery: {
+            operation->resultState = operation->question->state? spectre_strdup( operation->question->state ): NULL;
+            operation->keyCounter = SpectreCounterInitial;
+            spectre_free_string( &operation->keyContext );
+            operation->keyContext = operation->question->keyword? spectre_strdup( operation->question->keyword ): NULL;
             break;
         }
     }
@@ -694,18 +694,18 @@ void cli_keyCounter(Arguments *args, Operation *operation) {
         abort();
 
     long long int keyCounterInt = strtoll( args->keyCounter, NULL, 0 );
-    if (keyCounterInt < MPCounterValueFirst || keyCounterInt > MPCounterValueLast) {
+    if (keyCounterInt < SpectreCounterFirst || keyCounterInt > SpectreCounterLast) {
         ftl( "Invalid counter: %s", args->keyCounter );
         cli_free( args, operation );
         exit( EX_USAGE );
     }
 
     switch (operation->keyPurpose) {
-        case MPKeyPurposeAuthentication:
-            operation->keyCounter = operation->site->counter = (MPCounterValue)keyCounterInt;
+        case SpectreKeyPurposeAuthentication:
+            operation->keyCounter = operation->site->counter = (SpectreCounter)keyCounterInt;
             break;
-        case MPKeyPurposeIdentification:
-        case MPKeyPurposeRecovery:
+        case SpectreKeyPurposeIdentification:
+        case SpectreKeyPurposeRecovery:
             // NOTE: counter for login & question is not persisted.
             break;
     }
@@ -716,8 +716,8 @@ void cli_resultParam(Arguments *args, Operation *operation) {
     if (!args->resultParam)
         return;
 
-    mpw_free_string( &operation->resultParam );
-    operation->resultParam = mpw_strdup( args->resultParam );
+    spectre_free_string( &operation->resultParam );
+    operation->resultParam = spectre_strdup( args->resultParam );
 }
 
 void cli_algorithmVersion(Arguments *args, Operation *operation) {
@@ -728,34 +728,34 @@ void cli_algorithmVersion(Arguments *args, Operation *operation) {
         abort();
 
     unsigned long algorithmVersion = strtoul( args->algorithmVersion, NULL, 10 );
-    if (algorithmVersion < MPAlgorithmVersionFirst || algorithmVersion > MPAlgorithmVersionLast) {
+    if (algorithmVersion < SpectreAlgorithmFirst || algorithmVersion > SpectreAlgorithmLast) {
         ftl( "Invalid algorithm version: %s", args->algorithmVersion );
         cli_free( args, operation );
         exit( EX_USAGE );
     }
-    operation->site->algorithm = (MPAlgorithmVersion)algorithmVersion;
+    operation->site->algorithm = (SpectreAlgorithm)algorithmVersion;
 }
 
 void cli_fileRedacted(Arguments *args, Operation *operation) {
 
     if (args->fileRedacted)
-        operation->user->redacted = mpw_get_bool( args->fileRedacted );
+        operation->user->redacted = spectre_get_bool( args->fileRedacted );
 
     else if (!operation->user->redacted)
         wrn( "User configuration file is not redacted.  Use -R 1 to change this." );
 }
 
-void cli_mpw(Arguments *args, Operation *operation) {
+void cli_spectre(Arguments *args, Operation *operation) {
 
     if (!operation->site)
         abort();
 
-    if (mpw_verbosity >= MPLogLevelInfo)
+    if (spectre_verbosity >= SpectreLogLevelInfo)
         fprintf( stderr, "%s's %s for %s:\n[ %s ]: ",
                 operation->user->userName, operation->resultPurpose, operation->site->siteName, operation->identicon );
 
     // Check user keyID.
-    const MPUserKey *userKey = NULL;
+    const SpectreUserKey *userKey = NULL;
     if (operation->user->userKeyProvider)
         userKey = operation->user->userKeyProvider( operation->user->algorithm, operation->user->userName );
     if (!userKey) {
@@ -763,17 +763,17 @@ void cli_mpw(Arguments *args, Operation *operation) {
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
-    if (!mpw_id_valid( &operation->user->keyID ))
+    if (!spectre_id_valid( &operation->user->keyID ))
         operation->user->keyID = userKey->keyID;
-    else if (!mpw_id_equals( &userKey->keyID, &operation->user->keyID )) {
+    else if (!spectre_id_equals( &userKey->keyID, &operation->user->keyID )) {
         ftl( "user key mismatch." );
-        mpw_free( &userKey, sizeof( *userKey ) );
+        spectre_free( &userKey, sizeof( *userKey ) );
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
 
     // Resolve user key for site.
-    mpw_free( &userKey, sizeof( *userKey ) );
+    spectre_free( &userKey, sizeof( *userKey ) );
     if (operation->user->userKeyProvider)
         userKey = operation->user->userKeyProvider( operation->algorithm, operation->user->userName );
     if (!userKey) {
@@ -783,55 +783,55 @@ void cli_mpw(Arguments *args, Operation *operation) {
     }
 
     // Update state from resultParam if stateful.
-    if (operation->resultType & MPResultTypeClassStateful && operation->resultParam) {
-        mpw_free_string( &operation->resultState );
+    if (operation->resultType & SpectreResultClassStateful && operation->resultParam) {
+        spectre_free_string( &operation->resultState );
         if (!(operation->resultState =
-                mpw_site_state( userKey, operation->siteName,
+                spectre_site_state( userKey, operation->siteName,
                         operation->resultType, operation->resultParam,
                         operation->keyCounter, operation->keyPurpose, operation->keyContext ))) {
             ftl( "Couldn't encrypt result." );
-            mpw_free( &userKey, sizeof( *userKey ) );
+            spectre_free( &userKey, sizeof( *userKey ) );
             cli_free( args, operation );
             exit( EX_SOFTWARE );
         }
         inf( "(state) %s => ", operation->resultState );
 
         switch (operation->keyPurpose) {
-            case MPKeyPurposeAuthentication: {
-                mpw_free_string( &operation->site->resultState );
-                operation->site->resultState = mpw_strdup( operation->resultState );
+            case SpectreKeyPurposeAuthentication: {
+                spectre_free_string( &operation->site->resultState );
+                operation->site->resultState = spectre_strdup( operation->resultState );
                 break;
             }
-            case MPKeyPurposeIdentification: {
+            case SpectreKeyPurposeIdentification: {
                 if (strcmp( operation->siteName, operation->userName ) == OK) {
-                    mpw_free_string( &operation->user->loginState );
-                    operation->user->loginState = mpw_strdup( operation->resultState );
+                    spectre_free_string( &operation->user->loginState );
+                    operation->user->loginState = spectre_strdup( operation->resultState );
                 } else {
-                    mpw_free_string( &operation->site->loginState );
-                    operation->site->loginState = mpw_strdup( operation->resultState );
+                    spectre_free_string( &operation->site->loginState );
+                    operation->site->loginState = spectre_strdup( operation->resultState );
                 }
                 break;
             }
 
-            case MPKeyPurposeRecovery: {
-                mpw_free_string( &operation->question->state );
-                operation->question->state = mpw_strdup( operation->resultState );
+            case SpectreKeyPurposeRecovery: {
+                spectre_free_string( &operation->question->state );
+                operation->question->state = spectre_strdup( operation->resultState );
                 break;
             }
         }
 
         // resultParam is consumed.
-        mpw_free_string( &operation->resultParam );
+        spectre_free_string( &operation->resultParam );
     }
 
     // resultParam defaults to state.
     if (!operation->resultParam && operation->resultState)
-        operation->resultParam = mpw_strdup( operation->resultState );
+        operation->resultParam = spectre_strdup( operation->resultState );
 
     // Generate result.
-    const char *result = mpw_site_result( userKey, operation->siteName,
+    const char *result = spectre_site_result( userKey, operation->siteName,
             operation->resultType, operation->resultParam, operation->keyCounter, operation->keyPurpose, operation->keyContext );
-    mpw_free( &userKey, sizeof( *userKey ) );
+    spectre_free( &userKey, sizeof( *userKey ) );
     if (!result) {
         ftl( "Couldn't generate result." );
         cli_free( args, operation );
@@ -843,7 +843,7 @@ void cli_mpw(Arguments *args, Operation *operation) {
         fprintf( stdout, "\n" );
     if (operation->site->url)
         inf( "See: %s", operation->site->url );
-    mpw_free_string( &result );
+    spectre_free_string( &result );
 
     // Update usage metadata.
     operation->site->lastUsed = operation->user->lastUsed = time( NULL );
@@ -856,54 +856,52 @@ void cli_save(Arguments *args, Operation *operation) {
         return;
 
     if (!operation->fileFormatFixed)
-        operation->fileFormat = MPMarshalFormatDefault;
+        operation->fileFormat = SpectreFormatDefault;
 
     size_t count = 0;
-    const char **extensions = mpw_format_extensions( operation->fileFormat, &count );
+    const char **extensions = spectre_format_extensions( operation->fileFormat, &count );
     if (!extensions || !count)
         return;
 
-    mpw_free_string( &operation->filePath );
-    operation->filePath = mpw_path( operation->user->userName, extensions[0] );
-    dbg( "Updating: %s (%s)", operation->filePath, mpw_format_name( operation->fileFormat ) );
-    mpw_free( &extensions, count * sizeof( *extensions ) );
+    spectre_free_string( &operation->filePath );
+    operation->filePath = spectre_path( operation->user->userName, extensions[0] );
+    dbg( "Updating: %s (%s)", operation->filePath, spectre_format_name( operation->fileFormat ) );
+    spectre_free( &extensions, count * sizeof( *extensions ) );
 
     FILE *userFile = NULL;
-    if (!operation->filePath || !mpw_mkdirs( operation->filePath ) || !(userFile = fopen( operation->filePath, "w" ))) {
+    if (!operation->filePath || !spectre_mkdirs( operation->filePath ) || !(userFile = fopen( operation->filePath, "w" ))) {
         wrn( "Couldn't create updated configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
         return;
     }
 
-    const char *buf = mpw_marshal_write( operation->fileFormat, &operation->file, operation->user );
-    if (!buf || operation->file->error.type != MPMarshalSuccess)
+    const char *buf = spectre_marshal_write( operation->fileFormat, &operation->file, operation->user );
+    if (!buf || operation->file->error.type != SpectreMarshalSuccess)
         wrn( "Couldn't encode updated configuration file:\n  %s: %s", operation->filePath, operation->file->error.message );
 
     else if (fwrite( buf, sizeof( char ), strlen( buf ), userFile ) != strlen( buf ))
         wrn( "Error while writing updated configuration file:\n  %s: %d", operation->filePath, ferror( userFile ) );
 
-    mpw_free_string( &buf );
+    spectre_free_string( &buf );
     fclose( userFile );
 }
 
-static Operation *__cli_userKeyProvider_currentOperation = NULL;
+static Operation *__spectre_proxy_provider_current_operation = NULL;
 
-static bool __cli_userKeyProvider_op(const MPUserKey **currentKey, MPAlgorithmVersion *currentAlgorithm,
-        MPAlgorithmVersion algorithm, const char *userName) {
+static bool __spectre_proxy_provider_operation(const SpectreUserKey **currentKey, SpectreAlgorithm *currentAlgorithm,
+        SpectreAlgorithm algorithm, const char *userName) {
 
     if (!currentKey)
-        __cli_userKeyProvider_currentOperation = NULL;
-    if (!__cli_userKeyProvider_currentOperation)
-        return false;
-    if (!mpw_update_user_key( currentKey, currentAlgorithm, algorithm, userName,
-            __cli_userKeyProvider_currentOperation->userSecret ))
+        __spectre_proxy_provider_current_operation = NULL;
+    if (!__spectre_proxy_provider_current_operation)
         return false;
 
-    return true;
+    return spectre_update_user_key( currentKey, currentAlgorithm, algorithm, userName,
+                                    __spectre_proxy_provider_current_operation->userSecret );
 }
 
-MPUserKeyProvider cli_userKeyProvider_op(Operation *operation) {
+SpectreKeyProvider spectre_proxy_provider_set_operation(Operation *operation) {
 
-    mpw_userKeyProvider_free();
-    __cli_userKeyProvider_currentOperation = operation;
-    return mpw_userKeyProvider_proxy( __cli_userKeyProvider_op );
+    spectre_proxy_provider_unset();
+    __spectre_proxy_provider_current_operation = operation;
+    return spectre_proxy_provider_set( __spectre_proxy_provider_operation );
 }

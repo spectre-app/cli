@@ -1,14 +1,14 @@
 *.o
 *.dSYM
 
-mpw
-mpw-bench
-mpw-tests
+spectre
+spectre-bench
+spectre-tests
 
 TAG
 VERSION
-mpw-*.tar.gz
-mpw-*.tar.gz.sig
+spectre-*.tar.gz
+spectre-*.tar.gz.sig
 
 CMakeCache.txt
 CMakeFiles
