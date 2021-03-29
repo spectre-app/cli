@@ -168,7 +168,9 @@ haslib() {
 cc() (
     (( verbose )) && set -x
 
-    if { hash clang; } 2>/dev/null; then
+    if { hash "$CC"; } 2>/dev/null; then
+        "$CC" -std=c11 "$@"
+    elif { hash clang; } 2>/dev/null; then
         clang -std=c11 "$@"
     elif { hash llvm-gcc; } 2>/dev/null; then
         llvm-gcc -std=c11 "$@"

@@ -55,15 +55,97 @@ The source is broken down into several components:
  - [www](https://gitlab.com/spectre.app/www): The Spectre homepage.
 
 
-## Building and running
+## Building
 
-This repository hosts a Hugo static site.
+This repository hosts the POSIX command-line interface.
 
-Build using:
+To build the code to run on your specific system, run the `build` script:
+
+    ./build
+
+Note that the build depends on your system having certain dependencies already installed.
+By default, you'll need to have at least `libsodium`, `libjson-c` and `libncurses` installed.
+Missing dependencies will be indicated by the script.
+
+### Details
+
+The build script comes with a default configuration which can be adjusted.  Full details on the build script are available by opening the build script file.
+
+    [targets='...'] [spectre_feature=0|1 ...] [CFLAGS='...'] [LDFLAGS='...'] ./build [cc arguments ...]
+
+By default, the build script only builds the `spectre` target.  You can specify other targets or `all` to build all available targets.  These are the currently available targets:
+
+ - `spectre`        : The main app.  Options: needed: `spectre_sodium`, optional: `spectre_color`, `spectre_json`.
+ - `spectre-bench`  : A benchmark utility.  Options: needed: `spectre_sodium`.
+ - `spectre-tests`  : An algorithm test suite.  Options: needed: `spectre_sodium`, `spectre_xml`.
+
+It is smart to build the test suite along with the app, eg.:
+
+    targets='spectre spectre-tests' ./build
+
+The options determine the dependencies that the build will require.  The following exist:
+
+ - `spectre_sodium` : Use Sodium for the crypto implementation.  It needs libsodium.
+ - `spectre_json`   : Support JSON-based user configuration format.  It needs libjson-c.
+ - `spectre_color`  : Show a colorized identicon.  It needs libncurses.
+ - `spectre_xml`    : Support XML parsing.  It needs libxml2.
+
+By default, all options are enabled.  Each option can be disabled or enabled explicitly by prefixing the build command with an assignment of it to `0` or `1`, eg.:
+
+    spectre_color=0 ./build
+
+As a result of this command, you'd build the `spectre` target (which supports `spectre_color`) without color support.  The build no longer requires `libncurses` but the resulting `spectre` binary will not have support for colorized identicons.
+
+You can also pass CFLAGS or LDFLAGS to the build, or extra custom compiler arguments as arguments to the build script.
+For instance, to add a custom library search path, you could use:
+
+    LDFLAGS='-L/usr/local/lib' ./build
 
 
-```
-$ hugo
-```
+### Alternative: cmake
 
-The site should be available at `public/index.html`.
+There is also a cmake configuration you can use to build instead of using the `./build` script.  While `./build` depends on Bash and is geared toward POSIX systems, cmake is platform-independent.  You should use your platform's cmake tools to continue.  On POSIX systems, you should be able to use:
+
+    cmake . && make
+
+To get a list of options supported by the cmake configuration, use:
+
+    cmake -LH
+
+Options can be toggled like so:
+
+    cmake -DUSE_COLOR=OFF -DBUILD_SPECTRE_TESTS=ON . && make
+
+## Testing
+
+Once the client is built, you should run a test suite to make sure everything works as intended.
+
+There are currently two test programs:
+
+ - `spectre-tests`     : Tests the algorithm implementation.
+ - `spectre-cli-tests` : Tests the CLI application.
+
+The `spectre-tests` program is only available if you enabled its target during build (see "Details" above).
+
+The `spectre-cli-tests` is a Bash shell script, hence depends on your system having Bash available.
+
+
+## Installing
+
+Once you're happy with the result, you can install the `spectre` application into your system's `PATH`.
+
+Generally, all you need to do is copy the `spectre` file into a PATH directory, eg.:
+
+    cp spectre /usr/local/bin/
+
+The directory that you should copy the `spectre` file into will depend on your system.  Also note that `cp` is a POSIX command, if your system is not a POSIX system (eg. Windows) you'll need to adjust accordingly.
+
+There is also an `install` script to help with this process, though it is a Bash script and therefore requires that you have Bash installed:
+
+    ./install
+
+After installing, you should be able to run `spectre` and use it from anywhere in the terminal:
+
+    spectre -h
+    spectre google.com
+
