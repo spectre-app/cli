@@ -97,16 +97,16 @@ int main(int argc, char *const argv[]) {
 
     // Start BCrypt
     // Similar to phase-one of spectre
-    uint8_t bcrypt_rounds = 9;
+    uint8_t bcrypt_rounds = 10;
     iterations = 170; /* tuned to ~10s on dev machine */
     spectre_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
         bcrypt( userSecret, bcrypt_gensalt( bcrypt_rounds ) );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
-            fprintf( stderr, "\rbcrypt (rounds 10^%d): iteration %d / %d (%.0f%%)..", bcrypt_rounds, i, iterations, percent );
+            fprintf( stderr, "\rbcrypt-%d: iteration %d / %d (%.0f%%)..", bcrypt_rounds, i, iterations, percent );
     }
-    const double bcrypt9Speed = spectre_show_speed( startTime, iterations, "bcrypt" );
+    const double bcryptSpeed = spectre_show_speed( startTime, iterations, "bcrypt" );
 
     // Start SCrypt
     // Phase one of spectre
@@ -143,8 +143,8 @@ int main(int argc, char *const argv[]) {
     // Summarize.
     fprintf( stdout, "\n== SUMMARY ==\nOn this machine,\n" );
     fprintf( stdout, " - spectre is %f times slower than hmac-sha-256.\n", hmacSha256Speed / spectreSpeed );
-    fprintf( stdout, " - spectre is %f times slower than bcrypt (rounds 10^%d).\n", bcrypt9Speed / spectreSpeed, bcrypt_rounds );
-    fprintf( stdout, " - scrypt is %f times slower than bcrypt (rounds 10^%d).\n", bcrypt9Speed / scryptSpeed, bcrypt_rounds );
+    fprintf( stdout, " - spectre is %f times slower than bcrypt-%d.\n", bcryptSpeed / spectreSpeed, bcrypt_rounds );
+    fprintf( stdout, " - scrypt is %f times slower than bcrypt-%d.\n", bcryptSpeed / scryptSpeed, bcrypt_rounds );
 
     return 0;
 }
