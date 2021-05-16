@@ -100,6 +100,7 @@ int main(int argc, char *const argv[]) {
         xmlChar *siteName = spectre_xmlTestCaseString( testCase, "siteName" );
         SpectreCounter keyCounter = (SpectreCounter)spectre_xmlTestCaseInteger( testCase, "keyCounter" );
         xmlChar *resultTypeString = spectre_xmlTestCaseString( testCase, "resultType" );
+        xmlChar *resultParam = spectre_xmlTestCaseString( testCase, "resultParam" );
         xmlChar *keyPurposeString = spectre_xmlTestCaseString( testCase, "keyPurpose" );
         xmlChar *keyContext = spectre_xmlTestCaseString( testCase, "keyContext" );
         xmlChar *result = spectre_xmlTestCaseString( testCase, "result" );
@@ -115,13 +116,13 @@ int main(int argc, char *const argv[]) {
                     if (strstr((char *)id, argv[optind]) == (char *)id)
                         selected = true;
                 if (!selected)
-                    continue;
+                    break;
             }
 
             fprintf( stdout, "test case %s... ", id );
             if (!xmlStrlen( result )) {
-                fprintf( stdout, "abstract." );
-                continue;
+                fprintf( stdout, "abstract.\n" );
+                break;
             }
 
             // 1. calculate the user key.
@@ -129,23 +130,23 @@ int main(int argc, char *const argv[]) {
                     (char *)userName, (char *)userSecret, algorithm );
             if (!userKey) {
                 ftl( "Couldn't derive user key." );
-                abort();
+                break;
             }
 
             // Check the user key.
             if (!spectre_id_equals( &keyID, &userKey->keyID )) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (keyID: got %s != expected %s)\n", userKey->keyID.hex, keyID.hex );
-                continue;
+                break;
             }
 
             // 2. calculate the site password.
             const char *testResult = spectre_site_result(
-                    userKey, (char *)siteName, resultType, NULL, keyCounter, keyPurpose, (char *)keyContext );
+                    userKey, (char *)siteName, resultType, (char *)resultParam, keyCounter, keyPurpose, (char *)keyContext );
             spectre_free( &userKey, sizeof( *userKey ) );
             if (!testResult) {
                 ftl( "Couldn't derive site password." );
-                continue;
+                break;
             }
 
             // Check the site result.
@@ -153,7 +154,7 @@ int main(int argc, char *const argv[]) {
                 ++failedTests;
                 fprintf( stdout, "FAILED!  (result: got %s != expected %s)\n", testResult, result );
                 spectre_free_string( &testResult );
-                continue;
+                break;
             }
             spectre_free_string( &testResult );
 
@@ -166,6 +167,7 @@ int main(int argc, char *const argv[]) {
         xmlFree( userSecret );
         xmlFree( siteName );
         xmlFree( resultTypeString );
+        xmlFree( resultParam );
         xmlFree( keyPurposeString );
         xmlFree( keyContext );
         xmlFree( result );

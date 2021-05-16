@@ -73,6 +73,16 @@
         <resultType>Phrase</resultType>
         <result>re monnu mit jededda</result>
     </case>
+    <case id="v3_type_personal" parent="v3">
+        <resultType>Personal</resultType>
+        <resultParam>IfzlLN4J7XNazwSa17xB7A==</resultParam>
+        <result>password</result>
+    </case>
+    <case id="v3_type_personal_mb" parent="v3">
+        <resultType>Personal</resultType>
+        <resultParam>det+TQ+yVcDxLZ30EE7hMw==</resultParam>
+        <result>⛄</result>
+    </case>
     <case id="v3_counter_ceiling" parent="v3">
         <keyCounter>4294967295</keyCounter>
         <result>ZurdYoda6:Jogs</result>
@@ -138,6 +148,16 @@
     <case id="v2_type_phrase" parent="v2">
         <resultType>Phrase</resultType>
         <result>re monnu mit jededda</result>
+    </case>
+    <case id="v2_type_personal" parent="v2">
+        <resultType>Personal</resultType>
+        <resultParam>IfzlLN4J7XNazwSa17xB7A==</resultParam>
+        <result>password</result>
+    </case>
+    <case id="v2_type_personal_mb" parent="v2">
+        <resultType>Personal</resultType>
+        <resultParam>det+TQ+yVcDxLZ30EE7hMw==</resultParam>
+        <result>⛄</result>
     </case>
     <case id="v2_counter_ceiling" parent="v2">
         <keyCounter>4294967295</keyCounter>
@@ -205,6 +225,16 @@
         <resultType>Phrase</resultType>
         <result>re monnu mit jededda</result>
     </case>
+    <case id="v1_type_personal" parent="v1">
+        <resultType>Personal</resultType>
+        <resultParam>IfzlLN4J7XNazwSa17xB7A==</resultParam>
+        <result>password</result>
+    </case>
+    <case id="v1_type_personal_mb" parent="v1">
+        <resultType>Personal</resultType>
+        <resultParam>det+TQ+yVcDxLZ30EE7hMw==</resultParam>
+        <result>⛄</result>
+    </case>
     <case id="v1_counter_ceiling" parent="v1">
         <keyCounter>4294967295</keyCounter>
         <result>ZurdYoda6:Jogs</result>
@@ -270,6 +300,16 @@
     <case id="v0_type_phrase" parent="v0">
         <resultType>Phrase</resultType>
         <result>ne xoccu tix fepepla</result>
+    </case>
+    <case id="v0_type_personal" parent="v0">
+        <resultType>Personal</resultType>
+        <resultParam>IfzlLN4J7XNazwSa17xB7A==</resultParam>
+        <result>password</result>
+    </case>
+    <case id="v0_type_personal_mb" parent="v0">
+        <resultType>Personal</resultType>
+        <resultParam>det+TQ+yVcDxLZ30EE7hMw==</resultParam>
+        <result>⛄</result>
     </case>
     <case id="v0_counter_ceiling" parent="v0">
         <keyCounter>4294967295</keyCounter>
