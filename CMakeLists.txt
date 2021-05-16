@@ -128,7 +128,7 @@ endfunction()
 ### TARGET: SPECTRE
 if( BUILD_SPECTRE )
     # target
-    add_executable( spectre "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c"
+    add_executable( spectre "api/c/aes.c" "api/c/spectre-algorithm.c"
                         "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c"
                         "api/c/spectre-types.c" "api/c/spectre-util.c" "api/c/spectre-marshal-util.c" "api/c/spectre-marshal.c"
                         "src/spectre-cli-util.c" "src/spectre-cli.c" )
@@ -145,7 +145,7 @@ endif()
 ### TARGET: SPECTRE-BENCH
 if( BUILD_SPECTRE_BENCH )
     # target
-    add_executable( spectre-bench "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c"
+    add_executable( spectre-bench "api/c/aes.c" "api/c/spectre-algorithm.c"
                               "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c"
                               "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-bench.c" )
     target_include_directories( spectre-bench PUBLIC api/c src )
@@ -159,7 +159,7 @@ endif()
 ### TARGET: SPECTRE-TESTS
 if( BUILD_SPECTRE_TESTS )
     # target
-    add_executable( spectre-tests "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c"
+    add_executable( spectre-tests "api/c/aes.c" "api/c/spectre-algorithm.c"
                               "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c"
                               "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-tests-util.c" "src/spectre-tests.c" )
     target_include_directories( spectre-tests PUBLIC api/c src )

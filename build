@@ -100,7 +100,7 @@ spectre() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c" \
+       "api/c/aes.c" "api/c/spectre-algorithm.c" \
        "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c" \
        "api/c/spectre-types.c" "api/c/spectre-util.c" "api/c/spectre-marshal-util.c" "api/c/spectre-marshal.c" "src/spectre-cli-util.c" \
        "${ldflags[@]}" "src/spectre-cli.c" -o "spectre"
@@ -126,7 +126,7 @@ spectre-bench() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c" \
+       "api/c/aes.c" "api/c/spectre-algorithm.c" \
        "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c" \
        "api/c/spectre-types.c" "api/c/spectre-util.c" \
        "${ldflags[@]}" "src/spectre-bench.c" -o "spectre-bench"
@@ -153,7 +153,7 @@ spectre-tests() {
 
     # build
     cc "${cflags[@]}" "$@" \
-       "api/c/base64.c" "api/c/aes.c" "api/c/spectre-algorithm.c" \
+       "api/c/aes.c" "api/c/spectre-algorithm.c" \
        "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c" \
        "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-tests-util.c" \
        "${ldflags[@]}" "src/spectre-tests.c" -o "spectre-tests"
