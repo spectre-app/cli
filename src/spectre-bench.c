@@ -78,7 +78,7 @@ int main(int argc, char *const argv[]) {
     // Start HMAC-SHA-256
     // Similar to phase-two of spectre
     uint8_t *sitePasswordInfo = malloc( 128 );
-    iterations = 4200000; /* tuned to ~10s on dev machine */
+    iterations = 4300000/* ~10s on dev machine */ * 2;
     const SpectreUserKey *userKey = spectre_user_key( userName, userSecret, SpectreAlgorithmCurrent );
     if (!userKey) {
         ftl( "Could not allocate user key: %s", strerror( errno ) );
@@ -98,7 +98,7 @@ int main(int argc, char *const argv[]) {
     // Start BCrypt
     // Similar to phase-one of spectre
     uint8_t bcrypt_rounds = 10;
-    iterations = 170; /* tuned to ~10s on dev machine */
+    iterations = 170/* ~10s on dev machine */ * 2;
     spectre_time( &startTime );
     for (int i = 1; i <= iterations; ++i) {
         bcrypt( userSecret, bcrypt_gensalt( bcrypt_rounds ) );
@@ -110,15 +110,18 @@ int main(int argc, char *const argv[]) {
 
     // Start SCrypt
     // Phase one of spectre
-    iterations = 50; /* tuned to ~10s on dev machine */
+    uint8_t scrypt_rounds = 15;
+    iterations = 2/* ~10s on dev machine */ * 2;
     spectre_time( &startTime );
+    uint8_t *key = malloc(64);
     for (int i = 1; i <= iterations; ++i) {
-        free( (void *)spectre_user_key( userName, userSecret, SpectreAlgorithmCurrent ) );
+        spectre_kdf_scrypt( key, 64, (uint8_t *)userName, strlen( userName ), (uint8_t *)userSecret, strlen( userSecret ), pow( 2, scrypt_rounds ), 8, 2 );
 
         if (modff( 100.f * i / iterations, &percent ) == 0)
-            fprintf( stderr, "\rscrypt_spectre: iteration %d / %d (%.0f%%)..", i, iterations, percent );
+            fprintf( stderr, "\rscrypt-%d: iteration %d / %d (%.0f%%)..", scrypt_rounds, i, iterations, percent );
     }
-    const double scryptSpeed = spectre_show_speed( startTime, iterations, "scrypt_spectre" );
+    free( key );
+    const double scryptSpeed = spectre_show_speed( startTime, iterations, "scrypt" );
 
     // Start SPECTRE
     // Both phases of spectre
@@ -142,9 +145,12 @@ int main(int argc, char *const argv[]) {
 
     // Summarize.
     fprintf( stdout, "\n== SUMMARY ==\nOn this machine,\n" );
-    fprintf( stdout, " - spectre is %f times slower than hmac-sha-256.\n", hmacSha256Speed / spectreSpeed );
-    fprintf( stdout, " - spectre is %f times slower than bcrypt-%d.\n", bcryptSpeed / spectreSpeed, bcrypt_rounds );
-    fprintf( stdout, " - scrypt is %f times slower than bcrypt-%d.\n", bcryptSpeed / scryptSpeed, bcrypt_rounds );
+    fprintf( stdout, " - 1 spectre      = %13.6f x hmac-sha-256.\n",                hmacSha256Speed / spectreSpeed  );
+    fprintf( stdout, " - 1 spectre      = %13.6f x bcrypt-%d.\n",                   bcryptSpeed     / spectreSpeed, bcrypt_rounds );
+    fprintf( stdout, " - 1 spectre      = %13.6f x scrypt-%d.\n",                   scryptSpeed     / spectreSpeed, scrypt_rounds );
+    fprintf( stdout, " - 1 bcrypt-%-4d  = %13.6f x hmac-sha-256.\n", bcrypt_rounds, hmacSha256Speed / bcryptSpeed   );
+    fprintf( stdout, " - 1 bcrypt-%-4d  = %13.6f x scrypt-%d.\n", bcrypt_rounds,    scryptSpeed     / bcryptSpeed,  scrypt_rounds );
+    fprintf( stdout, " - 1 scrypt-%-4d  = %13.6f x hmac-sha-256.\n", scrypt_rounds, hmacSha256Speed / scryptSpeed   );
 
     return 0;
 }
