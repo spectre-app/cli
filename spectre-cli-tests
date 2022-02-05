@@ -69,6 +69,11 @@ spectre_expect() {
                 done < "$file"
             ;;
             json)
+                if ! hash jq 2>/dev/null; then
+                    printf >&2 "Error: jq not installed. Please install through your package manager or from https://stedolan.github.io/jq/\n"
+                    exit 1
+                fi
+
                 case $purpose in
                     a*) result=$(jq -r ".sites.\"$site\".password") ;;
                     i*) [[ $type && $type != none ]] \

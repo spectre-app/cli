@@ -43,7 +43,7 @@ Spectre's algorithm and implementation is fully documented and licensed Free Sof
 
 ## Components
 
-The source is broken down into several components:
+The source is broken down into several components, each hosted in their own repository. Submodules are used to correlate dependencies.
 
  - [api](https://gitlab.com/spectre.app/api): The algorithm's reference implementation and API library.  There is a C, Java and W3C interface.
  - [cli](https://gitlab.com/spectre.app/cli): The official command-line interface for POSIX systems.
