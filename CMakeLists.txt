@@ -1,6 +1,7 @@
 ### CMAKE
 project( spectre-cli C )
 cmake_minimum_required( VERSION 3.0.2 )
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 
 ### CONFIGURATION
@@ -39,14 +40,20 @@ endif()
 ### DEPENDENCIES
 function( use_spectre_sodium t r )
     if( USE_SODIUM )
-        find_library( libsodium NAMES sodium )
-        find_path( libsodium_include sodium.h )
-        include_directories("${libsodium_include}")
-        get_filename_component(libsodium_path "${libsodium}" PATH)
-        link_directories("${libsodium_path}")
-        target_link_libraries(  "${t}" PRIVATE sodium )
-        target_compile_definitions( "${t}" PRIVATE -DSPECTRE_SODIUM=1 )
-        message( STATUS         "${t}: USE_SODIUM is enabled." )
+        set( sodium_USE_STATIC_LIBS ON )
+        find_package( sodium )
+        if ( sodium_FOUND )
+            target_link_libraries( "${t}" PRIVATE sodium )
+            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_SODIUM=1 )
+            message( STATUS     "${t}: USE_SODIUM is enabled." )
+
+        elseif( r STREQUAL "required" )
+            message( FATAL_ERROR "${t}: USE_SODIUM was enabled but is missing libsodium.  Please install this library before continuing." )
+
+        else()
+            message( WARNING    "${t}: USE_SODIUM was enabled but is missing libsodium.  Will continue with USE_SODIUM disabled!" )
+
+        endif()
 
     elseif( r STREQUAL "required" )
         message( FATAL_ERROR    "${t}: USE_SODIUM was required but is not enabled.  Please enable the option or remove this target." )
@@ -61,9 +68,9 @@ function( use_spectre_color t )
     if( USE_COLOR )
         find_package( Curses )
         if ( CURSES_FOUND )
-            target_include_directories( "${t}" PRIVATE ${CURSES_INCLUDE_DIR} )
+            target_include_directories( "${t}" PRIVATE ${CURSES_INCLUDE_DIRS} )
             target_link_libraries( "${t}" PRIVATE ${CURSES_LIBRARIES} )
-            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_COLOR=1 ${CURSES_DEFINITIONS} )
+            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_COLOR=1 ${CURSES_CFLAGS} )
             message( STATUS     "${t}: USE_COLOR is enabled." )
 
         elseif( r STREQUAL "required" )
@@ -85,9 +92,19 @@ endfunction()
 
 function( use_spectre_json t )
     if( USE_JSON )
-        target_link_libraries(  "${t}" PRIVATE json-c )
-        target_compile_definitions( "${t}" PRIVATE -DSPECTRE_JSON=1 )
-        message( STATUS         "${t}: USE_JSON is enabled." )
+        find_package( json-c )
+        if ( json-c_FOUND )
+            target_link_libraries( "${t}" PRIVATE json-c::json-c-static )
+            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_JSON=1 )
+            message( STATUS     "${t}: USE_JSON is enabled." )
+
+        elseif( r STREQUAL "required" )
+            message( FATAL_ERROR "${t}: USE_JSON was enabled but is missing libjson-c.  Please install this library before continuing." )
+
+        else()
+            message( WARNING    "${t}: USE_JSON was enabled but is missing libjson-c.  Will continue with USE_JSON disabled!" )
+
+        endif()
 
     elseif( r STREQUAL "required" )
         message( FATAL_ERROR    "${t}: USE_JSON was required but is not enabled.  Please enable the option or remove this target." )
@@ -102,9 +119,8 @@ function( use_spectre_xml t r )
     find_package( LibXml2 )
     if( USE_XML )
         if ( LIBXML2_FOUND )
-            target_include_directories( "${t}" PRIVATE ${LIBXML2_INCLUDE_DIR} )
-            target_link_libraries( "${t}" PRIVATE ${LIBXML2_LIBRARIES} )
-            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_XML=1 ${LIBXML2_DEFINITIONS} )
+            target_link_libraries( "${t}" PRIVATE LibXml2::LibXml2 )
+            target_compile_definitions( "${t}" PRIVATE -DSPECTRE_XML=1 )
             message( STATUS     "${t}: USE_XML is enabled." )
 
         elseif( r STREQUAL "required" )
