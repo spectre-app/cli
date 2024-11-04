@@ -194,6 +194,8 @@ use() {
                 cflags+=( $_cflags ) ldflags+=( $_ldflags ); found=1
             elif _cflags=$(pkg-config --cflags "lib$lib" 2>/dev/null) && _ldflags=$(pkg-config --libs "lib$lib" 2>/dev/null); then
                 cflags+=( $_cflags ) ldflags+=( $_ldflags ); found=1
+            elif _cflags=$("$lib-config" --cflags 2>/dev/null) && _ldflags=$("$lib-config" --libs 2>/dev/null); then
+                cflags+=( $_cflags ) ldflags+=( $_ldflags ); found=1
             elif haslib "$lib"; then
                 ldflags+=( -l"$lib" ); found=1
             fi
@@ -236,7 +238,7 @@ use_spectre_json() {
 }
 use_spectre_xml() {
     local requisite=$1
-    use spectre_xml "$requisite" xml2 && cflags+=( $(xml2-config --cflags) ) ldflags+=( $(xml2-config --libs) ) ||:
+    use spectre_xml "$requisite" xml2 ||:
 }
 
 

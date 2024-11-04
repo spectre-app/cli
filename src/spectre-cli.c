@@ -568,7 +568,7 @@ void cli_site(Arguments *args, Operation *operation) {
     // If no site from the user's file, create a new one.
     if (!operation->site)
         operation->site = spectre_marshal_site(
-                user, operation->siteName, user->defaultType, SpectreCounterDefault, user->algorithm );
+                user, operation->siteName, user->resultType, SpectreCounterDefault, user->algorithm );
 }
 
 void cli_question(Arguments *args, Operation *operation) {
