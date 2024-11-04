@@ -87,14 +87,14 @@ The options determine the dependencies that the build will require.  The followi
 
  - `spectre_sodium` : Use Sodium for the crypto implementation.  It needs libsodium.
  - `spectre_json`   : Support JSON-based user configuration format.  It needs libjson-c.
- - `spectre_color`  : Show a colorized identicon.  It needs libncurses.
+ - `spectre_color`  : Use advanced terminal support for input/output.  It needs libcurses/libtinfo.
  - `spectre_xml`    : Support XML parsing.  It needs libxml2.
 
 By default, all options are enabled.  Each option can be disabled or enabled explicitly by prefixing the build command with an assignment of it to `0` or `1`, eg.:
 
     spectre_color=0 ./build
 
-As a result of this command, you'd build the `spectre` target (which supports `spectre_color`) without color support.  The build no longer requires `libncurses` but the resulting `spectre` binary will not have support for colorized identicons.
+As a result of this command, you'd build the `spectre` target (which supports a `spectre_color` flag), but with color support turned off.  The build no longer requires a terminal library but the resulting `spectre` binary will not have support for advanced terminal features such as colorized identicons or silent dialog-based input, falling back to the most basic POSIX input/output mechanisms.
 
 You can also pass CFLAGS or LDFLAGS to the build, or extra custom compiler arguments as arguments to the build script.
 For instance, to add a custom library search path, you could use:
