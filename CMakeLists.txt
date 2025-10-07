@@ -1,6 +1,6 @@
 ### CMAKE
 project( spectre-cli C )
-cmake_minimum_required( VERSION 3.0.2 )
+cmake_minimum_required( VERSION 3.5 )
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 
