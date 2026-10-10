@@ -138,6 +138,7 @@ spectre-bench() {
 spectre-tests() {
     # dependencies
     use_spectre_sodium required
+    use_spectre_json optional
     use_spectre_xml required
 
     # target
@@ -155,7 +156,8 @@ spectre-tests() {
     cc "${cflags[@]}" "$@" \
        "api/c/aes.c" "api/c/spectre-algorithm.c" \
        "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c" \
-       "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-tests-util.c" \
+       "api/c/spectre-types.c" "api/c/spectre-util.c" "api/c/spectre-marshal-util.c" "api/c/spectre-marshal.c" \
+       "src/spectre-tests-util.c" \
        "${ldflags[@]}" "src/spectre-tests.c" -o "spectre-tests"
     echo "done!  You can now use ./$_"
 }

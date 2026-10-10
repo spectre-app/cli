@@ -65,10 +65,10 @@ const char *spectre_askpass(const char *prompt) {
         // askpass fork
         close( pipes[0] );
         if (dup2( pipes[1], STDOUT_FILENO ) == ERR)
-            ftl( "Couldn't connect pipe to process: %s", strerror( errno ) );
+            err( "Couldn't connect pipe to process: %s", strerror( errno ) );
 
         else if (execlp( askpass, askpass, prompt, NULL ) == ERR)
-            ftl( "Couldn't execute askpass:\n  %s: %s", askpass, strerror( errno ) );
+            err( "Couldn't execute askpass:\n  %s: %s", askpass, strerror( errno ) );
 
         exit( EX_SOFTWARE );
     }
@@ -227,34 +227,19 @@ const char *spectre_path(const char *prefix, const char *extension) {
 
 bool spectre_mkdirs(const char *filePath) {
 
-    if (!filePath)
+    char *path = (char *)spectre_strdup( filePath );
+    if (!path)
         return false;
 
-    // Save the cwd and for absolute paths, start at the root.
-    char *cwd = getcwd( NULL, 0 );
-    if (*filePath == '/')
-        if (chdir( "/" ) == ERR)
-            return false;
-
-    // The path to mkdir is the filePath without the last path component.
-    char *pathEnd = strrchr( filePath, '/' );
-    if (!pathEnd)
-        return true;
-
-    // Walk the path.
+    // Make each directory along the path, up to the file's name.
     bool success = true;
-    char *path = (char *)spectre_strndup( filePath, (size_t)(pathEnd - filePath) );
-    for (char *dirName = strtok( path, "/" ); success && dirName; dirName = strtok( NULL, "/" )) {
-        if (!strlen( dirName ))
-            continue;
-
-        success &= (mkdir( dirName, 0700 ) != ERR || errno == EEXIST) && chdir( dirName ) != ERR;
-    }
+    for (char *pathEnd = strchr( path, '/' ); success && pathEnd; pathEnd = strchr( pathEnd + 1, '/' ))
+        if (pathEnd != path) {
+            *pathEnd = '\0';
+            success = mkdir( path, 0700 ) != ERR || errno == EEXIST;
+            *pathEnd = '/';
+        }
     free( path );
-
-    if (chdir( cwd ) == ERR)
-        wrn( "Could not restore cwd:\n  %s: %s", cwd, strerror( errno ) );
-    free( cwd );
 
     return success;
 }
@@ -263,11 +248,14 @@ const char *spectre_read_fd(int fd) {
 
     char *buf = NULL;
     size_t blockSize = 4096, bufSize = 0, bufOffset = 0;
-    ssize_t readSize = 0;
+    ssize_t readSize = ERR;
     while ((spectre_realloc( &buf, &bufSize, char, bufSize / sizeof( char ) + blockSize )) &&
-           ((readSize = read( fd, buf + bufOffset, blockSize )) > 0));
-    if (readSize == ERR)
+           ((readSize = read( fd, buf + bufOffset, blockSize )) > 0))
+        bufOffset += (size_t)readSize;
+    if (readSize != 0)
         spectre_free( &buf, bufSize );
+    else
+        buf[bufOffset] = '\0';
 
     return buf;
 }
@@ -282,8 +270,10 @@ const char *spectre_read_file(FILE *file) {
     while ((spectre_realloc( &buf, &bufSize, char, bufSize / sizeof( char ) + blockSize )) &&
            (bufOffset += (readSize = fread( buf + bufOffset, 1, blockSize, file ))) &&
            (readSize == blockSize));
-    if (ferror( file ))
+    if (!feof( file ) || ferror( file ))
         spectre_free( &buf, bufSize );
+    else
+        buf[bufOffset] = '\0';
 
     return buf;
 }
@@ -325,6 +315,8 @@ static const char *spectre_tputs(const char *str, int affcnt) {
     if (str_tputs)
         spectre_free( &str_tputs, str_tputs_max );
     str_tputs = calloc( str_tputs_max, sizeof( char ) );
+    if (!str_tputs)
+        return NULL;
     str_tputs_cursor = -1;
 
     const char *result = tputs( str, affcnt, spectre_tputc ) == ERR? NULL: spectre_strndup( str_tputs, str_tputs_max );

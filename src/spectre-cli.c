@@ -24,6 +24,8 @@
 #include <string.h>
 #include <errno.h>
 #include <sysexits.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #include "spectre-cli-util.h"
 #include "spectre-algorithm.h"
@@ -147,6 +149,7 @@ typedef struct {
     bool omitNewline;
     bool allowPasswordUpdate;
     bool fileFormatFixed;
+    bool saveRequired;
     SpectreFormat fileFormat;
     const char *filePath;
     const char *userName;
@@ -187,7 +190,7 @@ void cli_resultParam(Arguments *args, Operation *operation);
 void cli_algorithmVersion(Arguments *args, Operation *operation);
 void cli_fileRedacted(Arguments *args, Operation *operation);
 void cli_spectre(Arguments *args, Operation *operation);
-void cli_save(Arguments *args, Operation *operation);
+bool cli_save(Arguments *args, Operation *operation);
 
 SpectreKeyProvider spectre_proxy_provider_set_operation(Operation *operation);
 
@@ -258,10 +261,10 @@ int main(const int argc, char *const argv[]) {
     cli_spectre( NULL, &operation );
 
     // Save changes and clean up.
-    cli_save( NULL, &operation );
+    bool saved = cli_save( NULL, &operation );
     cli_free( NULL, &operation );
 
-    return EX_OK;
+    return saved || !operation.saveRequired? EX_OK: EX_CANTCREAT;
 }
 
 void cli_free(Arguments *args, Operation *operation) {
@@ -348,20 +351,20 @@ void cli_args(Arguments *args, Operation *operation, const int argc, char *const
             case '?':
                 switch (optopt) {
                     case 'u':
-                        ftl( "Missing user name to option: -%c", optopt );
+                        err( "Missing user name to option: -%c", optopt );
                         exit( EX_USAGE );
                     case 't':
-                        ftl( "Missing type name to option: -%c", optopt );
+                        err( "Missing type name to option: -%c", optopt );
                         exit( EX_USAGE );
                     case 'c':
-                        ftl( "Missing counter value to option: -%c", optopt );
+                        err( "Missing counter value to option: -%c", optopt );
                         exit( EX_USAGE );
                     default:
-                        ftl( "Unknown option: -%c", optopt );
+                        err( "Unknown option: -%c", optopt );
                         exit( EX_USAGE );
                 }
             default:
-                ftl( "Unexpected option: %c", opt );
+                err( "Unexpected option: %c", opt );
                 exit( EX_USAGE );
         }
 
@@ -378,11 +381,11 @@ void cli_userName(Arguments *args, Operation *operation) {
 
     if (!operation->userName || !strlen( operation->userName ))
         do {
-            operation->userName = spectre_getline( "Your full name:" );
+            spectre_replace_string( operation->userName, spectre_getline( "Your full name:" ) );
         } while (operation->userName && !strlen( operation->userName ));
 
     if (!operation->userName || !strlen( operation->userName )) {
-        ftl( "Missing full name." );
+        err( "Missing full name." );
         cli_free( args, operation );
         exit( EX_DATAERR );
     }
@@ -393,7 +396,13 @@ void cli_userSecret(Arguments *args, Operation *operation) {
     spectre_free_string( &operation->userSecret );
 
     if (args->userSecretFD) {
-        operation->userSecret = spectre_read_fd( (int)strtol( args->userSecretFD, NULL, 10 ) );
+        uint32_t userSecretFD = spectre_get_u32( args->userSecretFD, 0, INT32_MAX );
+        if ((uint32_t)ERR == userSecretFD) {
+            err( "Invalid file descriptor: %s", args->userSecretFD );
+            cli_free( args, operation );
+            exit( EX_USAGE );
+        }
+        operation->userSecret = spectre_read_fd( userSecretFD );
         if (!operation->userSecret && errno)
             wrn( "Error reading personal secret from FD %s: %s", args->userSecretFD, strerror( errno ) );
     }
@@ -407,7 +416,7 @@ void cli_userSecret(Arguments *args, Operation *operation) {
         } while (operation->userSecret && !strlen( operation->userSecret ));
 
     if (!operation->userSecret || !strlen( operation->userSecret )) {
-        ftl( "Missing personal secret." );
+        err( "Missing personal secret." );
         cli_free( args, operation );
         exit( EX_DATAERR );
     }
@@ -419,11 +428,11 @@ void cli_siteName(Arguments *args, Operation *operation) {
 
     if (args->siteName)
         operation->siteName = spectre_strdup( args->siteName );
-    if (!operation->siteName)
-        operation->siteName = spectre_getline( "Site Domain:" );
+    if (!operation->siteName || !strlen( operation->siteName ))
+        spectre_replace_string( operation->siteName, spectre_getline( "Site Domain:" ) );
 
-    if (!operation->siteName) {
-        ftl( "Missing site name." );
+    if (!operation->siteName || !strlen( operation->siteName )) {
+        err( "Missing site name." );
         cli_free( args, operation );
         exit( EX_DATAERR );
     }
@@ -435,8 +444,8 @@ void cli_fileFormat(Arguments *args, Operation *operation) {
         return;
 
     operation->fileFormat = spectre_format_named( args->fileFormat );
-    if (ERR == (int)operation->fileFormat) {
-        ftl( "Invalid file format: %s", args->fileFormat );
+    if ((SpectreFormat)ERR == operation->fileFormat) {
+        err( "Invalid file format: %s", args->fileFormat );
         cli_free( args, operation );
         exit( EX_DATAERR );
     }
@@ -448,8 +457,8 @@ void cli_keyPurpose(Arguments *args, Operation *operation) {
         return;
 
     operation->keyPurpose = spectre_purpose_named( args->keyPurpose );
-    if (ERR == (int)operation->keyPurpose) {
-        ftl( "Invalid purpose: %s", args->keyPurpose );
+    if ((SpectreKeyPurpose)ERR == operation->keyPurpose) {
+        err( "Invalid purpose: %s", args->keyPurpose );
         cli_free( args, operation );
         exit( EX_DATAERR );
     }
@@ -501,7 +510,7 @@ void cli_user(Arguments *args, Operation *operation) {
         // Load the user object from the user's file.
         const char *fileInputData = spectre_read_file( userFile );
         if (!fileInputData || ferror( userFile ))
-            wrn( "Error while reading configuration file:\n  %s: %d", operation->filePath, ferror( userFile ) );
+            wrn( "Error while reading configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
         fclose( userFile );
 
         // Parse file.
@@ -513,6 +522,7 @@ void cli_user(Arguments *args, Operation *operation) {
 
             if (operation->file->error.type == SpectreMarshalErrorUserSecret && operation->allowPasswordUpdate) {
                 // Update personal secret in the user's file.
+                operation->saveRequired = true;
                 while (operation->file->error.type == SpectreMarshalErrorUserSecret) {
                     inf( "Given personal secret does not match configuration." );
                     inf( "To update the configuration with this new personal secret, first confirm the old personal secret." );
@@ -525,8 +535,10 @@ void cli_user(Arguments *args, Operation *operation) {
 
                     spectre_marshal_user_free( &operation->user );
                     operation->user = spectre_marshal_auth( operation->file, spectre_proxy_provider_set_secret( importUserSecret ) );
-                    if (operation->file && operation->user)
+                    if (operation->file && operation->user) {
                         operation->user->userKeyProvider = spectre_proxy_provider_set_operation( operation );
+                        operation->user->keyID = SpectreKeyIDUnset;
+                    }
                     spectre_free_string( &importUserSecret );
                 }
             }
@@ -535,7 +547,7 @@ void cli_user(Arguments *args, Operation *operation) {
 
         // Incorrect personal secret.
         if (operation->file->error.type == SpectreMarshalErrorUserSecret) {
-            ftl( "Incorrect personal secret according to configuration:\n  %s: %s", operation->filePath, operation->file->error.message );
+            err( "Incorrect personal secret according to configuration:\n  %s: %s", operation->filePath, operation->file->error.message );
             cli_free( args, operation );
             exit( EX_DATAERR );
         }
@@ -627,8 +639,8 @@ void cli_resultType(Arguments *args, Operation *operation) {
         return;
 
     operation->resultType = spectre_type_named( args->resultType );
-    if (ERR == (int)operation->resultType) {
-        ftl( "Invalid type: %s", args->resultType );
+    if ((SpectreResultType)ERR == operation->resultType) {
+        err( "Invalid type: %s", args->resultType );
         cli_free( args, operation );
         exit( EX_USAGE );
     }
@@ -693,16 +705,16 @@ void cli_keyCounter(Arguments *args, Operation *operation) {
     if (!operation->site)
         abort();
 
-    long long int keyCounterInt = strtoll( args->keyCounter, NULL, 0 );
-    if (keyCounterInt < SpectreCounterFirst || keyCounterInt > SpectreCounterLast) {
-        ftl( "Invalid counter: %s", args->keyCounter );
+    SpectreCounter keyCounter = spectre_get_u32( args->keyCounter, SpectreCounterFirst, SpectreCounterLast );
+    if ((SpectreCounter)ERR == keyCounter) {
+        err( "Invalid counter: %s", args->keyCounter );
         cli_free( args, operation );
         exit( EX_USAGE );
     }
 
     switch (operation->keyPurpose) {
         case SpectreKeyPurposeAuthentication:
-            operation->keyCounter = operation->site->counter = (SpectreCounter)keyCounterInt;
+            operation->keyCounter = operation->site->counter = keyCounter;
             break;
         case SpectreKeyPurposeIdentification:
         case SpectreKeyPurposeRecovery:
@@ -727,13 +739,13 @@ void cli_algorithmVersion(Arguments *args, Operation *operation) {
     if (!operation->site)
         abort();
 
-    unsigned long algorithmVersion = strtoul( args->algorithmVersion, NULL, 10 );
-    if (algorithmVersion < SpectreAlgorithmFirst || algorithmVersion > SpectreAlgorithmLast) {
-        ftl( "Invalid algorithm version: %s", args->algorithmVersion );
+    SpectreAlgorithm algorithmVersion = spectre_get_u32( args->algorithmVersion, SpectreAlgorithmFirst, SpectreAlgorithmLast );
+    if ((SpectreAlgorithm)ERR == algorithmVersion) {
+        err( "Invalid algorithm version: %s", args->algorithmVersion );
         cli_free( args, operation );
         exit( EX_USAGE );
     }
-    operation->site->algorithm = (SpectreAlgorithm)algorithmVersion;
+    operation->site->algorithm = algorithmVersion;
 }
 
 void cli_fileRedacted(Arguments *args, Operation *operation) {
@@ -759,14 +771,14 @@ void cli_spectre(Arguments *args, Operation *operation) {
     if (operation->user->userKeyProvider)
         userKey = operation->user->userKeyProvider( operation->user->algorithm, operation->user->userName );
     if (!userKey) {
-        ftl( "Couldn't derive user key." );
+        err( "Couldn't derive user key." );
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
     if (!spectre_id_valid( &operation->user->keyID ))
         operation->user->keyID = userKey->keyID;
     else if (!spectre_id_equals( &userKey->keyID, &operation->user->keyID )) {
-        ftl( "user key mismatch." );
+        err( "user key mismatch." );
         spectre_free( &userKey, sizeof( *userKey ) );
         cli_free( args, operation );
         exit( EX_SOFTWARE );
@@ -777,7 +789,7 @@ void cli_spectre(Arguments *args, Operation *operation) {
     if (operation->user->userKeyProvider)
         userKey = operation->user->userKeyProvider( operation->algorithm, operation->user->userName );
     if (!userKey) {
-        ftl( "Couldn't derive user key." );
+        err( "Couldn't derive user key." );
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
@@ -789,7 +801,7 @@ void cli_spectre(Arguments *args, Operation *operation) {
                 spectre_site_state( userKey, operation->siteName,
                         operation->resultType, operation->resultParam,
                         operation->keyCounter, operation->keyPurpose, operation->keyContext ))) {
-            ftl( "Couldn't encrypt result." );
+            err( "Couldn't encrypt result." );
             spectre_free( &userKey, sizeof( *userKey ) );
             cli_free( args, operation );
             exit( EX_SOFTWARE );
@@ -822,6 +834,7 @@ void cli_spectre(Arguments *args, Operation *operation) {
 
         // resultParam is consumed.
         spectre_free_string( &operation->resultParam );
+        operation->saveRequired = true;
     }
 
     // resultParam defaults to state.
@@ -833,7 +846,7 @@ void cli_spectre(Arguments *args, Operation *operation) {
             operation->resultType, operation->resultParam, operation->keyCounter, operation->keyPurpose, operation->keyContext );
     spectre_free( &userKey, sizeof( *userKey ) );
     if (!result) {
-        ftl( "Couldn't generate result." );
+        err( "Couldn't generate result." );
         cli_free( args, operation );
         exit( EX_SOFTWARE );
     }
@@ -850,10 +863,10 @@ void cli_spectre(Arguments *args, Operation *operation) {
     operation->site->uses++;
 }
 
-void cli_save(Arguments *args, Operation *operation) {
+bool cli_save(Arguments *args, Operation *operation) {
 
     if (!operation->file || !operation->user)
-        return;
+        return true;
 
     if (!operation->fileFormatFixed)
         operation->fileFormat = SpectreFormatDefault;
@@ -861,42 +874,54 @@ void cli_save(Arguments *args, Operation *operation) {
     size_t count = 0;
     const char **extensions = spectre_format_extensions( operation->fileFormat, &count );
     if (!extensions || !count)
-        return;
+        return true;
 
     spectre_free_string( &operation->filePath );
     operation->filePath = spectre_path( operation->user->userName, extensions[0] );
     dbg( "Updating: %s (%s)", operation->filePath, spectre_format_name( operation->fileFormat ) );
     spectre_free( &extensions, count * sizeof( *extensions ) );
 
-    FILE *userFile = NULL;
-    if (!operation->filePath || !spectre_mkdirs( operation->filePath ) || !(userFile = fopen( operation->filePath, "w" ))) {
-        wrn( "Couldn't create updated configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
-        return;
+    const char *buf = spectre_marshal_write( operation->fileFormat, &operation->file, operation->user );
+    if (!buf || operation->file->error.type != SpectreMarshalSuccess) {
+        wrn( "Couldn't encode updated configuration file:\n  %s: %s", operation->filePath, operation->file->error.message );
+        spectre_free_string( &buf );
+        return false;
     }
 
-    const char *buf = spectre_marshal_write( operation->fileFormat, &operation->file, operation->user );
-    if (!buf || operation->file->error.type != SpectreMarshalSuccess)
-        wrn( "Couldn't encode updated configuration file:\n  %s: %s", operation->filePath, operation->file->error.message );
+    struct stat fileStat;
+    mode_t fileMode = operation->filePath && stat( operation->filePath, &fileStat ) == OK? fileStat.st_mode & 0777: 0666;
+    const char *tempPath = NULL;
+    int tempFD = ERR;
+    if (!operation->filePath || !spectre_mkdirs( operation->filePath ) ||
+        !(tempPath = spectre_str( "%s~", operation->filePath )) ||
+        ERR == (tempFD = open( tempPath, O_WRONLY | O_CREAT | O_TRUNC, fileMode ))) {
+        wrn( "Couldn't create updated configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
+        spectre_free_strings( &buf, &tempPath, NULL );
+        return false;
+    }
 
-    else if (fwrite( buf, sizeof( char ), strlen( buf ), userFile ) != strlen( buf ))
-        wrn( "Error while writing updated configuration file:\n  %s: %d", operation->filePath, ferror( userFile ) );
+    bool written = write( tempFD, buf, strlen( buf ) ) == (ssize_t)strlen( buf );
+    if (close( tempFD ) != OK || !written || rename( tempPath, operation->filePath ) != OK) {
+        wrn( "Error while writing updated configuration file:\n  %s: %s", operation->filePath, strerror( errno ) );
+        unlink( tempPath );
+        spectre_free_strings( &buf, &tempPath, NULL );
+        return false;
+    }
 
-    spectre_free_string( &buf );
-    fclose( userFile );
+    spectre_free_strings( &buf, &tempPath, NULL );
+    return true;
 }
 
 static Operation *__spectre_proxy_provider_current_operation = NULL;
 
-static bool __spectre_proxy_provider_operation(const SpectreUserKey **currentKey, SpectreAlgorithm *currentAlgorithm,
-        SpectreAlgorithm algorithm, const char *userName) {
+static bool __spectre_proxy_provider_operation(const SpectreUserKey **currentKey, SpectreAlgorithm algorithm, const char *userName) {
 
     if (!currentKey)
         __spectre_proxy_provider_current_operation = NULL;
     if (!__spectre_proxy_provider_current_operation)
         return false;
 
-    return spectre_update_user_key( currentKey, currentAlgorithm, algorithm, userName,
-                                    __spectre_proxy_provider_current_operation->userSecret );
+    return spectre_update_user_key( currentKey, algorithm, userName, __spectre_proxy_provider_current_operation->userSecret );
 }
 
 SpectreKeyProvider spectre_proxy_provider_set_operation(Operation *operation) {

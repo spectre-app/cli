@@ -42,8 +42,10 @@
 
 static void spectre_time(struct timeval *time) {
 
-    if (gettimeofday( time, NULL ) != OK)
+    if (gettimeofday( time, NULL ) != OK) {
         ftl( "Could not get time: %s", strerror( errno ) );
+        abort();
+    }
 }
 
 static const double spectre_show_speed(struct timeval startTime, const unsigned int iterations, const char *operation) {
@@ -78,6 +80,10 @@ int main(int argc, char *const argv[]) {
     // Start HMAC-SHA-256
     // Similar to phase-two of spectre
     uint8_t *sitePasswordInfo = malloc( 128 );
+    if (!sitePasswordInfo) {
+        ftl( "Could not allocate site password info: %s", strerror( errno ) );
+        abort();
+    }
     iterations = 4300000/* ~10s on dev machine */ * 2;
     const SpectreUserKey *userKey = spectre_user_key( userName, userSecret, SpectreAlgorithmCurrent );
     if (!userKey) {
@@ -114,6 +120,10 @@ int main(int argc, char *const argv[]) {
     iterations = 2/* ~10s on dev machine */ * 2;
     spectre_time( &startTime );
     uint8_t *key = malloc(64);
+    if (!key) {
+        ftl( "Could not allocate key: %s", strerror( errno ) );
+        abort();
+    }
     for (int i = 1; i <= iterations; ++i) {
         spectre_kdf_scrypt( key, 64, (uint8_t *)userName, strlen( userName ), (uint8_t *)userSecret, strlen( userSecret ), pow( 2, scrypt_rounds ), 8, 2 );
 
@@ -130,7 +140,7 @@ int main(int argc, char *const argv[]) {
     for (int i = 1; i <= iterations; ++i) {
         userKey = spectre_user_key( userName, userSecret, SpectreAlgorithmCurrent );
         if (!userKey) {
-            ftl( "Could not allocate user key: %s", strerror( errno ) );
+            err( "Could not allocate user key: %s", strerror( errno ) );
             break;
         }
 

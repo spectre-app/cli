@@ -9,7 +9,7 @@
         <resultType>Long</resultType>
         <keyCounter>1</keyCounter>
         <keyPurpose>Authentication</keyPurpose>
-        <result><!-- abstract --></result>
+        <format>none</format>
     </case>
 
     <!-- Algorithm 3 -->
@@ -84,8 +84,8 @@
         <result>⛄</result>
     </case>
     <case id="v3_counter_ceiling" parent="v3">
-        <keyCounter>4294967295</keyCounter>
-        <result>ZurdYoda6:Jogs</result>
+        <keyCounter>4294967294</keyCounter>
+        <result>LoqiWarcFetd6(</result>
     </case>
 
     <!-- Algorithm 2 -->
@@ -160,8 +160,8 @@
         <result>⛄</result>
     </case>
     <case id="v2_counter_ceiling" parent="v2">
-        <keyCounter>4294967295</keyCounter>
-        <result>ZurdYoda6:Jogs</result>
+        <keyCounter>4294967294</keyCounter>
+        <result>LoqiWarcFetd6(</result>
     </case>
 
     <!-- Algorithm 1 -->
@@ -236,8 +236,8 @@
         <result>⛄</result>
     </case>
     <case id="v1_counter_ceiling" parent="v1">
-        <keyCounter>4294967295</keyCounter>
-        <result>ZurdYoda6:Jogs</result>
+        <keyCounter>4294967294</keyCounter>
+        <result>LoqiWarcFetd6(</result>
     </case>
 
     <!-- Algorithm 0 -->
@@ -312,8 +312,1331 @@
         <result>⛄</result>
     </case>
     <case id="v0_counter_ceiling" parent="v0">
-        <keyCounter>4294967295</keyCounter>
-        <result>WunoRopz1!Fovw</result>
+        <keyCounter>4294967294</keyCounter>
+        <result>SojiLargQebu6_</result>
+    </case>
+
+    <!-- flat -->
+    <case id="v3_flat" parent="v3">
+        <format>flat</format>
+    </case>
+    <case id="v3_mb_userName_flat" parent="v3_mb_userName">
+        <format>flat</format>
+    </case>
+    <case id="v3_mb_userSecret_flat" parent="v3_mb_userSecret">
+        <format>flat</format>
+    </case>
+    <case id="v3_mb_siteName_flat" parent="v3_mb_siteName">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_maximum_flat" parent="v3_type_maximum">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_medium_flat" parent="v3_type_medium">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_basic_flat" parent="v3_type_basic">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_short_flat" parent="v3_type_short">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_pin_flat" parent="v3_type_pin">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_name_flat" parent="v3_type_name">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_phrase_flat" parent="v3_type_phrase">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_personal_flat" parent="v3_type_personal">
+        <format>flat</format>
+    </case>
+    <case id="v3_type_personal_mb_flat" parent="v3_type_personal_mb">
+        <format>flat</format>
+    </case>
+    <case id="v3_counter_ceiling_flat" parent="v3_counter_ceiling">
+        <format>flat</format>
+    </case>
+    <case id="v2_flat" parent="v2">
+        <format>flat</format>
+    </case>
+    <case id="v2_mb_userName_flat" parent="v2_mb_userName">
+        <format>flat</format>
+    </case>
+    <case id="v2_mb_userSecret_flat" parent="v2_mb_userSecret">
+        <format>flat</format>
+    </case>
+    <case id="v2_mb_siteName_flat" parent="v2_mb_siteName">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_maximum_flat" parent="v2_type_maximum">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_medium_flat" parent="v2_type_medium">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_basic_flat" parent="v2_type_basic">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_short_flat" parent="v2_type_short">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_pin_flat" parent="v2_type_pin">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_name_flat" parent="v2_type_name">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_phrase_flat" parent="v2_type_phrase">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_personal_flat" parent="v2_type_personal">
+        <format>flat</format>
+    </case>
+    <case id="v2_type_personal_mb_flat" parent="v2_type_personal_mb">
+        <format>flat</format>
+    </case>
+    <case id="v2_counter_ceiling_flat" parent="v2_counter_ceiling">
+        <format>flat</format>
+    </case>
+    <case id="v1_flat" parent="v1">
+        <format>flat</format>
+    </case>
+    <case id="v1_mb_userName_flat" parent="v1_mb_userName">
+        <format>flat</format>
+    </case>
+    <case id="v1_mb_userSecret_flat" parent="v1_mb_userSecret">
+        <format>flat</format>
+    </case>
+    <case id="v1_mb_siteName_flat" parent="v1_mb_siteName">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_maximum_flat" parent="v1_type_maximum">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_medium_flat" parent="v1_type_medium">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_basic_flat" parent="v1_type_basic">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_short_flat" parent="v1_type_short">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_pin_flat" parent="v1_type_pin">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_name_flat" parent="v1_type_name">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_phrase_flat" parent="v1_type_phrase">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_personal_flat" parent="v1_type_personal">
+        <format>flat</format>
+    </case>
+    <case id="v1_type_personal_mb_flat" parent="v1_type_personal_mb">
+        <format>flat</format>
+    </case>
+    <case id="v1_counter_ceiling_flat" parent="v1_counter_ceiling">
+        <format>flat</format>
+    </case>
+    <case id="v0_flat" parent="v0">
+        <format>flat</format>
+    </case>
+    <case id="v0_mb_userName_flat" parent="v0_mb_userName">
+        <format>flat</format>
+    </case>
+    <case id="v0_mb_userSecret_flat" parent="v0_mb_userSecret">
+        <format>flat</format>
+    </case>
+    <case id="v0_mb_siteName_flat" parent="v0_mb_siteName">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_maximum_flat" parent="v0_type_maximum">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_medium_flat" parent="v0_type_medium">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_basic_flat" parent="v0_type_basic">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_short_flat" parent="v0_type_short">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_pin_flat" parent="v0_type_pin">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_name_flat" parent="v0_type_name">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_phrase_flat" parent="v0_type_phrase">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_personal_flat" parent="v0_type_personal">
+        <format>flat</format>
+    </case>
+    <case id="v0_type_personal_mb_flat" parent="v0_type_personal_mb">
+        <format>flat</format>
+    </case>
+    <case id="v0_counter_ceiling_flat" parent="v0_counter_ceiling">
+        <format>flat</format>
+    </case>
+
+    <!-- json -->
+    <case id="v3_json" parent="v3">
+        <format>json</format>
+    </case>
+    <case id="v3_mb_userName_json" parent="v3_mb_userName">
+        <format>json</format>
+    </case>
+    <case id="v3_mb_userSecret_json" parent="v3_mb_userSecret">
+        <format>json</format>
+    </case>
+    <case id="v3_mb_siteName_json" parent="v3_mb_siteName">
+        <format>json</format>
+    </case>
+    <case id="v3_loginName_json" parent="v3_loginName">
+        <format>json</format>
+    </case>
+    <case id="v3_securityAnswer_json" parent="v3_securityAnswer">
+        <format>json</format>
+    </case>
+    <case id="v3_securityAnswer_context_json" parent="v3_securityAnswer_context">
+        <format>json</format>
+    </case>
+    <case id="v3_type_maximum_json" parent="v3_type_maximum">
+        <format>json</format>
+    </case>
+    <case id="v3_type_medium_json" parent="v3_type_medium">
+        <format>json</format>
+    </case>
+    <case id="v3_type_basic_json" parent="v3_type_basic">
+        <format>json</format>
+    </case>
+    <case id="v3_type_short_json" parent="v3_type_short">
+        <format>json</format>
+    </case>
+    <case id="v3_type_pin_json" parent="v3_type_pin">
+        <format>json</format>
+    </case>
+    <case id="v3_type_name_json" parent="v3_type_name">
+        <format>json</format>
+    </case>
+    <case id="v3_type_phrase_json" parent="v3_type_phrase">
+        <format>json</format>
+    </case>
+    <case id="v3_type_personal_json" parent="v3_type_personal">
+        <format>json</format>
+    </case>
+    <case id="v3_type_personal_mb_json" parent="v3_type_personal_mb">
+        <format>json</format>
+    </case>
+    <case id="v3_counter_ceiling_json" parent="v3_counter_ceiling">
+        <format>json</format>
+    </case>
+    <case id="v2_json" parent="v2">
+        <format>json</format>
+    </case>
+    <case id="v2_mb_userName_json" parent="v2_mb_userName">
+        <format>json</format>
+    </case>
+    <case id="v2_mb_userSecret_json" parent="v2_mb_userSecret">
+        <format>json</format>
+    </case>
+    <case id="v2_mb_siteName_json" parent="v2_mb_siteName">
+        <format>json</format>
+    </case>
+    <case id="v2_loginName_json" parent="v2_loginName">
+        <format>json</format>
+    </case>
+    <case id="v2_securityAnswer_json" parent="v2_securityAnswer">
+        <format>json</format>
+    </case>
+    <case id="v2_securityAnswer_context_json" parent="v2_securityAnswer_context">
+        <format>json</format>
+    </case>
+    <case id="v2_type_maximum_json" parent="v2_type_maximum">
+        <format>json</format>
+    </case>
+    <case id="v2_type_medium_json" parent="v2_type_medium">
+        <format>json</format>
+    </case>
+    <case id="v2_type_basic_json" parent="v2_type_basic">
+        <format>json</format>
+    </case>
+    <case id="v2_type_short_json" parent="v2_type_short">
+        <format>json</format>
+    </case>
+    <case id="v2_type_pin_json" parent="v2_type_pin">
+        <format>json</format>
+    </case>
+    <case id="v2_type_name_json" parent="v2_type_name">
+        <format>json</format>
+    </case>
+    <case id="v2_type_phrase_json" parent="v2_type_phrase">
+        <format>json</format>
+    </case>
+    <case id="v2_type_personal_json" parent="v2_type_personal">
+        <format>json</format>
+    </case>
+    <case id="v2_type_personal_mb_json" parent="v2_type_personal_mb">
+        <format>json</format>
+    </case>
+    <case id="v2_counter_ceiling_json" parent="v2_counter_ceiling">
+        <format>json</format>
+    </case>
+    <case id="v1_json" parent="v1">
+        <format>json</format>
+    </case>
+    <case id="v1_mb_userName_json" parent="v1_mb_userName">
+        <format>json</format>
+    </case>
+    <case id="v1_mb_userSecret_json" parent="v1_mb_userSecret">
+        <format>json</format>
+    </case>
+    <case id="v1_mb_siteName_json" parent="v1_mb_siteName">
+        <format>json</format>
+    </case>
+    <case id="v1_loginName_json" parent="v1_loginName">
+        <format>json</format>
+    </case>
+    <case id="v1_securityAnswer_json" parent="v1_securityAnswer">
+        <format>json</format>
+    </case>
+    <case id="v1_securityAnswer_context_json" parent="v1_securityAnswer_context">
+        <format>json</format>
+    </case>
+    <case id="v1_type_maximum_json" parent="v1_type_maximum">
+        <format>json</format>
+    </case>
+    <case id="v1_type_medium_json" parent="v1_type_medium">
+        <format>json</format>
+    </case>
+    <case id="v1_type_basic_json" parent="v1_type_basic">
+        <format>json</format>
+    </case>
+    <case id="v1_type_short_json" parent="v1_type_short">
+        <format>json</format>
+    </case>
+    <case id="v1_type_pin_json" parent="v1_type_pin">
+        <format>json</format>
+    </case>
+    <case id="v1_type_name_json" parent="v1_type_name">
+        <format>json</format>
+    </case>
+    <case id="v1_type_phrase_json" parent="v1_type_phrase">
+        <format>json</format>
+    </case>
+    <case id="v1_type_personal_json" parent="v1_type_personal">
+        <format>json</format>
+    </case>
+    <case id="v1_type_personal_mb_json" parent="v1_type_personal_mb">
+        <format>json</format>
+    </case>
+    <case id="v1_counter_ceiling_json" parent="v1_counter_ceiling">
+        <format>json</format>
+    </case>
+    <case id="v0_json" parent="v0">
+        <format>json</format>
+    </case>
+    <case id="v0_mb_userName_json" parent="v0_mb_userName">
+        <format>json</format>
+    </case>
+    <case id="v0_mb_userSecret_json" parent="v0_mb_userSecret">
+        <format>json</format>
+    </case>
+    <case id="v0_mb_siteName_json" parent="v0_mb_siteName">
+        <format>json</format>
+    </case>
+    <case id="v0_loginName_json" parent="v0_loginName">
+        <format>json</format>
+    </case>
+    <case id="v0_securityAnswer_json" parent="v0_securityAnswer">
+        <format>json</format>
+    </case>
+    <case id="v0_securityAnswer_context_json" parent="v0_securityAnswer_context">
+        <format>json</format>
+    </case>
+    <case id="v0_type_maximum_json" parent="v0_type_maximum">
+        <format>json</format>
+    </case>
+    <case id="v0_type_medium_json" parent="v0_type_medium">
+        <format>json</format>
+    </case>
+    <case id="v0_type_basic_json" parent="v0_type_basic">
+        <format>json</format>
+    </case>
+    <case id="v0_type_short_json" parent="v0_type_short">
+        <format>json</format>
+    </case>
+    <case id="v0_type_pin_json" parent="v0_type_pin">
+        <format>json</format>
+    </case>
+    <case id="v0_type_name_json" parent="v0_type_name">
+        <format>json</format>
+    </case>
+    <case id="v0_type_phrase_json" parent="v0_type_phrase">
+        <format>json</format>
+    </case>
+    <case id="v0_type_personal_json" parent="v0_type_personal">
+        <format>json</format>
+    </case>
+    <case id="v0_type_personal_mb_json" parent="v0_type_personal_mb">
+        <format>json</format>
+    </case>
+    <case id="v0_counter_ceiling_json" parent="v0_counter_ceiling">
+        <format>json</format>
+    </case>
+
+    <!-- Historical documents remain readable. -->
+    <case id="read_flat_format0" parent="v3">
+        <format>flat</format>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 0
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1      17:3                spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_format1" parent="v3">
+        <format>flat</format>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_format2" parent="v3">
+        <format>flat</format>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 2
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Result Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_version_absent" parent="v3">
+        <format>flat</format>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 0
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1      17                  spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_counter_absent" parent="v3">
+        <format>flat</format>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3                             	              spectre.app	
+]]></input>
+    </case>
+
+    <!-- Flat values are whole numbers. -->
+    <case id="read_flat_format_text" parent="v3">
+        <format>flat</format>
+        <error>Format</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: x
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_algorithm_text" parent="v3">
+        <format>flat</format>
+        <error>Illegal</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: x
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_avatar_text" parent="v3">
+        <format>flat</format>
+        <error>Illegal</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: x
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_uses_suffix" parent="v3">
+        <format>flat</format>
+        <error>Illegal</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z        1x    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_type_wrapped" parent="v3">
+        <format>flat</format>
+        <error>Illegal</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    4294967313:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_version_hex" parent="v3">
+        <format>flat</format>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:0x3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_counter_text" parent="v3">
+        <format>flat</format>
+        <error>Illegal</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:x                           	              spectre.app	
+]]></input>
+    </case>
+
+    <!-- Malformed flat documents report the first defect found. -->
+    <case id="read_flat_header_colon" parent="v3">
+        <format>flat</format>
+        <error>Structure</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_format_unsupported" parent="v3">
+        <format>flat</format>
+        <error>Format</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 3
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+]]></input>
+    </case>
+    <case id="read_flat_site_truncated" parent="v3">
+        <format>flat</format>
+        <error>Missing</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1
+]]></input>
+    </case>
+    <case id="read_flat_header_unterminated" parent="v3">
+        <format>flat</format>
+        <error>Structure</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+]]></input>
+    </case>
+    <case id="read_flat_first_error" parent="v3">
+        <format>flat</format>
+        <error>Structure</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1
+]]></input>
+    </case>
+    <case id="read_flat_name_absent" parent="v3">
+        <format>flat</format>
+        <error>Missing</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           	              spectre.app	
+]]></input>
+    </case>
+    <case id="read_flat_site_name_empty" parent="v3">
+        <format>flat</format>
+        <error>Missing</error>
+        <input><![CDATA[# Spectre site export
+#     Export of site names and stored passwords (unless device-private) encrypted with the user key.
+# 
+##
+# Format: 1
+# Date: 2021-10-31T00:00:00Z
+# User Name: Robert Lee Mitchell
+# Full Name: Robert Lee Mitchell
+# Identicon: 7:╔░╗♚
+# Avatar: 3
+# Key ID: 98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302
+# Algorithm: 3
+# Default Type: 17
+# Passwords: PROTECTED
+##
+#
+2021-10-31T00:00:00Z         1    17:3:1                           		
+]]></input>
+    </case>
+    <case id="read_json_format1" parent="v3">
+        <format>json</format>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 1 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "default_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_format2" parent="v3">
+        <format>json</format>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 2 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "default_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "services": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_format3" parent="v3">
+        <format>json</format>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+
+    <!-- A file that omits the optional key_id still authenticates. -->
+    <case id="read_json_keyid_absent" parent="v3">
+        <format>json</format>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+
+    <!-- A key_id that is not a key ID is rejected, not dereferenced. -->
+    <case id="read_json_keyid_malformed" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_keyid_short" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_wrong_secret" parent="v3">
+        <format>json</format>
+        <error>UserSecret</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "0000000000000000000000000000000000000000000000000000000000000000",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+
+    <!-- Stored state that cannot be decrypted produces no result. -->
+    <case id="read_json_state_short" parent="v3">
+        <format>json</format>
+        <result/>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 1056, "password": "Jw==",
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_state_nonblock" parent="v3">
+        <format>json</format>
+        <result/>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 1056, "password": "AAAAAAAAAAAAAAAAAAAA",
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_state_notbase64" parent="v3">
+        <format>json</format>
+        <result/>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 1056, "password": "!!!!not base64!!",
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+
+    <!-- Values outside their documented range are reported as illegal. -->
+    <case id="read_json_algorithm_high" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 9,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_type_unknown" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 12345,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_counter_negative" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": -3, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_counter_high" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 4294967295, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_avatar_negative" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": -1,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_algorithm_fraction" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 2.5, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_type_negative" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": -1,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_uses_fraction" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17,
+      "uses": 2.5, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_counter_string" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": "5", "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_site_name_empty" parent="v3">
+        <format>json</format>
+        <error>Missing</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "": {
+      "counter": 5, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_format_unsupported" parent="v3">
+        <format>json</format>
+        <error>Format</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 4 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 5, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_format_text" parent="v3">
+        <format>json</format>
+        <error>Format</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": "x" },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 5, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_format_absent" parent="v3">
+        <format>json</format>
+        <error>Format</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 5, "algorithm": 3, "type": 17,
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+    <case id="read_json_question_type_unknown" parent="v3">
+        <format>json</format>
+        <error>Illegal</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": {
+    "spectre.app": {
+      "counter": 1, "algorithm": 3, "type": 17, "questions": { "": { "type": 99999 } },
+      "uses": 1, "last_used": "2021-10-31T00:00:00Z"
+    }
+  }
+}]]></input>
+    </case>
+
+    <!-- Structurally surprising documents are reported, not crashed on. -->
+    <case id="read_json_user_absent" parent="v3">
+        <format>json</format>
+        <error>Missing</error>
+        <input><![CDATA[{ "export": { "format": 3 }, "sites": {} }]]></input>
+    </case>
+    <case id="read_json_empty_object" parent="v3">
+        <format>json</format>
+        <error>Format</error>
+        <input><![CDATA[{}]]></input>
+    </case>
+    <case id="read_json_truncated" parent="v3">
+        <format>json</format>
+        <error>Format</error>
+        <input><![CDATA[{ "export": { "format": 3 }, "user": { "full_name": ]]></input>
+    </case>
+    <case id="read_json_sites_array" parent="v3">
+        <format>json</format>
+        <error>Missing</error>
+        <input><![CDATA[{
+  "export": { "date": "2021-10-31T00:00:00Z", "redacted": true, "format": 3 },
+  "user": {
+    "avatar": 3,
+    "full_name": "Robert Lee Mitchell",
+    "algorithm": 3,
+    "key_id": "98EEF4D1DF46D849574A82A03C3177056B15DFFCA29BB3899DE4628453675302",
+    "result_type": 17,
+    "last_used": "2021-10-31T00:00:00Z"
+  },
+  "sites": [ "spectre.app", "spectre.pw" ]
+}]]></input>
     </case>
 </tests>
-

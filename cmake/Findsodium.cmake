@@ -210,11 +210,13 @@ if(sodium_INCLUDE_DIR)
   set(_VERSION_HEADER "${sodium_INCLUDE_DIR}/sodium/version.h")
   if(EXISTS "${_VERSION_HEADER}")
     file(READ "${_VERSION_HEADER}" _VERSION_HEADER_CONTENT)
-    string(REGEX
-           REPLACE ".*define[ \t]+SODIUM_VERSION_STRING[^\"]+\"([^\"]+)\".*"
-                   "\\1"
-                   sodium_VERSION_STRING
-                   "${_VERSION_HEADER_CONTENT}")
+    string(
+      REGEX
+      REPLACE
+        ".*define[ \t]+SODIUM_VERSION_STRING[^\"]+\"([^\"]+)\".*"
+        "\\1"
+        sodium_VERSION_STRING
+        "${_VERSION_HEADER_CONTENT}")
     set(sodium_VERSION_STRING "${sodium_VERSION_STRING}")
   endif()
 endif()
@@ -228,6 +230,10 @@ find_package_handle_standard_args(sodium
                                   sodium_INCLUDE_DIR
                                   VERSION_VAR
                                   sodium_VERSION_STRING)
+
+if (NOT sodium_FOUND)
+  return()
+endif()
 
 # mark file paths as advanced
 mark_as_advanced(sodium_INCLUDE_DIR)

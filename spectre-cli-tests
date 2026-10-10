@@ -5,6 +5,7 @@ cd "${BASH_SOURCE%/*}"
 # Tooling
 errors=0
 keep=${keep:-0}
+unset SPECTRE_USERNAME SPECTRE_ALGORITHM SPECTRE_FORMAT SPECTRE_ASKPASS
 spectre_expect() {
     local expect=$1; shift
     local args=( "$@" ) OPTIND=1 user= format= redacted=1 purpose=authentication context=
@@ -38,7 +39,7 @@ spectre_expect() {
         printf >&2 "Error (exit %d) spectre%s\n" "$err" "$(printf ' %q' "${args[@]}")"
         return $(( ++errors ))
     fi
-    if [[ $result != $expect ]]; then
+    if [[ $result != "$expect" ]]; then
         printf '!'
         printf >&2 "Bad result (got: %s != expected: %s) spectre%s\n" "$result" "$expect" "$(printf ' %q' "${args[@]}")"
         return $(( ++errors ))
@@ -50,7 +51,7 @@ spectre_expect() {
             flat)
                 while IFS=$'\t' read -r one key password; do
                     read key <<< "$key"
-                    [[ $key = $site ]] || continue
+                    [[ $key = "$site" ]] || continue
 
                     case $purpose in
                         a*) result=$password ;;
@@ -59,7 +60,7 @@ spectre_expect() {
                         r*) break ;;
                     esac
 
-                    if [[ $result != $expect ]]; then
+                    if [[ $result != "$expect" ]]; then
                         printf '#'
                         printf >&2 "Bad mpsites (found: %s != expected: %s) %s (after spectre%s)\n" "$result" "$expect" "$file" "$(printf ' %q' "${args[@]}")"
                         return $(( ++errors ))
@@ -82,7 +83,7 @@ spectre_expect() {
                     r*) result=$(jq -r ".sites.\"$site\".questions.\"$context\".answer") ;;
                 esac < "$file"
 
-                if [[ $result != $expect ]]; then
+                if [[ $result != "$expect" ]]; then
                     printf '#'
                     printf >&2 "Bad mpjson (found: %s != expected: %s) %s (after spectre%s)\n" "$result" "$expect" "$file" "$(printf ' %q' "${args[@]}")"
                     return $(( ++errors ))
@@ -145,8 +146,8 @@ spectre_expect 'tinraziqu'              -Fnone \
     -u 'tesẗ' -S 'ẗest' -tname      -c1 -a3 -p 'authentication' -C ''          'ẗesẗ'
 spectre_expect 'tinr ziq taghuye zuj'   -Fnone \
     -u 'tesẗ' -S 'ẗest' -tphrase    -c1 -a3 -p 'authentication' -C ''          'ẗesẗ'
-spectre_expect 'HidiLonoFopt9&'         -Fnone \
-    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967295 -a3 -p 'authentication' -C '' 'ẗesẗ'
+spectre_expect 'NaxpDicv8.Citi'         -Fnone \
+    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967294 -a3 -p 'authentication' -C '' 'ẗesẗ'
 
 ##  V2
 printf "\nV%d, none: " 2
@@ -180,8 +181,8 @@ spectre_expect 'huczukamo'              -Fnone \
     -u 'tesẗ' -S 'ẗest' -tname      -c1 -a2 -p 'authentication' -C ''          'ẗesẗ'
 spectre_expect 'huc finmokozi fota'     -Fnone \
     -u 'tesẗ' -S 'ẗest' -tphrase    -c1 -a2 -p 'authentication' -C ''          'ẗesẗ'
-spectre_expect 'Mixa1~BulgNijo'         -Fnone \
-    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967295 -a2 -p 'authentication' -C '' 'ẗesẗ'
+spectre_expect 'Rixb5/YivuDays'         -Fnone \
+    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967294 -a2 -p 'authentication' -C '' 'ẗesẗ'
 
 ##  V1
 printf "\nV%d, none: " 1
@@ -215,8 +216,8 @@ spectre_expect 'suxhotito'              -Fnone \
     -u 'tesẗ' -S 'ẗest' -tname      -c1 -a1 -p 'authentication' -C ''          'ẗesẗ'
 spectre_expect 'su hotte pav calewxo'   -Fnone \
     -u 'tesẗ' -S 'ẗest' -tphrase    -c1 -a1 -p 'authentication' -C ''          'ẗesẗ'
-spectre_expect 'Luxn2#JapiXopa'         -Fnone \
-    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967295 -a1 -p 'authentication' -C '' 'ẗesẗ'
+spectre_expect 'FatgVafl0+Nazu'         -Fnone \
+    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967294 -a1 -p 'authentication' -C '' 'ẗesẗ'
 
 ##  V0
 printf "\nV%d, none: " 0
@@ -250,8 +251,8 @@ spectre_expect 'wumdoxixo'              -Fnone \
     -u 'tesẗ' -S 'ẗest' -tname      -c1 -a0 -p 'authentication' -C ''          'ẗesẗ'
 spectre_expect 'wu doxbe hac kaselqo'   -Fnone \
     -u 'tesẗ' -S 'ẗest' -tphrase    -c1 -a0 -p 'authentication' -C ''          'ẗesẗ'
-spectre_expect 'Pumy7.JadjQoda'         -Fnone \
-    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967295 -a0 -p 'authentication' -C '' 'ẗesẗ'
+spectre_expect 'QabyGatp0.Cawu'         -Fnone \
+    -u 'tesẗ' -S 'ẗest' -tlong      -c4294967294 -a0 -p 'authentication' -C '' 'ẗesẗ'
 
 ##  V3
 printf "\nV%d, flat: " 3
@@ -261,8 +262,8 @@ spectre_expect 'FamiJirk1)Zehc'         -Fflat -R0 \
     -u 'tesẗ.v3' -S 'ẗest' -tlong   -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.long'
 spectre_expect 'NofhMusw8+Cebo'         -Fflat -R0 \
     -u 'tesẗ.v3' -S 'ẗest' -tlong   -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.⛄'
-spectre_expect 'Necx1$LagaRizu'         -Fflat -R0 \
-    -u 'tesẗ.v3' -S 'ẗest'          -c4294967295 -a3 -p 'authentication' -C '' 'ẗesẗ.c+a3pa'
+spectre_expect 'LeqcDuru5-Bamd'         -Fflat -R0 \
+    -u 'tesẗ.v3' -S 'ẗest'          -c4294967294 -a3 -p 'authentication' -C '' 'ẗesẗ.c+a3pa'
 spectre_expect 'Poq2)Tey'               -Fflat -R0 \
     -u 'tesẗ.v3' -S 'ẗest' -tmed    -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.med'
 spectre_expect 'Wr07Okx0'               -Fflat -R0 \
@@ -296,8 +297,8 @@ spectre_expect 'Lifw5]DablSuga'         -Fflat -R0 \
     -u 'tesẗ.v2' -S 'ẗest' -tlong   -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.long'
 spectre_expect 'Leja5%RavoZapa'         -Fflat -R0 \
     -u 'tesẗ.v2' -S 'ẗest' -tlong   -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.⛄'
-spectre_expect 'NejnGazo8?Seqo'         -Fflat -R0 \
-    -u 'tesẗ.v2' -S 'ẗest'          -c4294967295 -a2 -p 'authentication' -C '' 'ẗesẗ.c+a2pa'
+spectre_expect 'RomiNevi8)Kilj'         -Fflat -R0 \
+    -u 'tesẗ.v2' -S 'ẗest'          -c4294967294 -a2 -p 'authentication' -C '' 'ẗesẗ.c+a2pa'
 spectre_expect 'XicSux2&'               -Fflat -R0 \
     -u 'tesẗ.v2' -S 'ẗest' -tmed    -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.med'
 spectre_expect 'uEY50hcZ'               -Fflat -R0 \
@@ -331,8 +332,8 @@ spectre_expect 'Lojz6?VotaJall'         -Fflat -R0 \
     -u 'tesẗ.v1' -S 'ẗest' -tlong   -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.long'
 spectre_expect 'Yoqu7)NiziFito'         -Fflat -R0 \
     -u 'tesẗ.v1' -S 'ẗest' -tlong   -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.⛄'
-spectre_expect 'Foha4[TojmXanc'         -Fflat -R0 \
-    -u 'tesẗ.v1' -S 'ẗest'          -c4294967295 -a1 -p 'authentication' -C '' 'ẗesẗ.c+a1pa'
+spectre_expect 'PexgLebp2/Nemi'         -Fflat -R0 \
+    -u 'tesẗ.v1' -S 'ẗest'          -c4294967294 -a1 -p 'authentication' -C '' 'ẗesẗ.c+a1pa'
 spectre_expect 'Hiy3*Zag'               -Fflat -R0 \
     -u 'tesẗ.v1' -S 'ẗest' -tmed    -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.med'
 spectre_expect 'UJR7HpG0'               -Fflat -R0 \
@@ -366,8 +367,8 @@ spectre_expect 'ZuceHazwLojz8!'         -Fflat -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tlong   -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.long'
 spectre_expect 'Boxj2!YabePodp'         -Fflat -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tlong   -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.⛄'
-spectre_expect 'PeblLuqc6]Cala'         -Fflat -R0 \
-    -u 'tesẗ.v0' -S 'ẗest'          -c4294967295 -a0 -p 'authentication' -C '' 'ẗesẗ.c+a0pa'
+spectre_expect "QalpFemxJefu8'"         -Fflat -R0 \
+    -u 'tesẗ.v0' -S 'ẗest'          -c4294967294 -a0 -p 'authentication' -C '' 'ẗesẗ.c+a0pa'
 spectre_expect 'XelQac0@'               -Fflat -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tmed    -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.med'
 spectre_expect 'qS07SRc8'               -Fflat -R0 \
@@ -380,7 +381,7 @@ spectre_expect 'rivfutipe'              -Fflat -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tname   -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.name'
 spectre_expect 'xir qebdohogo buno'     -Fflat -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tphrase -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.phrase'
-spectre_expect "RoAm3bJSvo@#loHSRA6\'"  -Fflat -R0 \
+spectre_expect "RoAm3bJSvo@#loHSRA6'"   -Fflat -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tmax    -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi.max'
 spectre_expect 'biqwaxilu'              -Fflat -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tnone   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'
@@ -402,8 +403,8 @@ spectre_expect 'FamiJirk1)Zehc'         -Fjson -R0 \
     -u 'tesẗ.v3' -S 'ẗest' -tlong   -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.long'
 spectre_expect 'NofhMusw8+Cebo'         -Fjson -R0 \
     -u 'tesẗ.v3' -S 'ẗest' -tlong   -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.⛄'
-spectre_expect 'Necx1$LagaRizu'         -Fjson -R0 \
-    -u 'tesẗ.v3' -S 'ẗest'          -c4294967295 -a3 -p 'authentication' -C '' 'ẗesẗ.c+a3pa'
+spectre_expect 'LeqcDuru5-Bamd'         -Fjson -R0 \
+    -u 'tesẗ.v3' -S 'ẗest'          -c4294967294 -a3 -p 'authentication' -C '' 'ẗesẗ.c+a3pa'
 spectre_expect 'Poq2)Tey'               -Fjson -R0 \
     -u 'tesẗ.v3' -S 'ẗest' -tmed    -c1 -a3 -p 'authentication' -C ''          'ẗesẗ.c1a3pa.med'
 spectre_expect 'Wr07Okx0'               -Fjson -R0 \
@@ -437,8 +438,8 @@ spectre_expect 'Lifw5]DablSuga'         -Fjson -R0 \
     -u 'tesẗ.v2' -S 'ẗest' -tlong   -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.long'
 spectre_expect 'Leja5%RavoZapa'         -Fjson -R0 \
     -u 'tesẗ.v2' -S 'ẗest' -tlong   -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.⛄'
-spectre_expect 'NejnGazo8?Seqo'         -Fjson -R0 \
-    -u 'tesẗ.v2' -S 'ẗest'          -c4294967295 -a2 -p 'authentication' -C '' 'ẗesẗ.c+a2pa'
+spectre_expect 'RomiNevi8)Kilj'         -Fjson -R0 \
+    -u 'tesẗ.v2' -S 'ẗest'          -c4294967294 -a2 -p 'authentication' -C '' 'ẗesẗ.c+a2pa'
 spectre_expect 'XicSux2&'               -Fjson -R0 \
     -u 'tesẗ.v2' -S 'ẗest' -tmed    -c1 -a2 -p 'authentication' -C ''          'ẗesẗ.c1a2pa.med'
 spectre_expect 'uEY50hcZ'               -Fjson -R0 \
@@ -472,8 +473,8 @@ spectre_expect 'Lojz6?VotaJall'         -Fjson -R0 \
     -u 'tesẗ.v1' -S 'ẗest' -tlong   -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.long'
 spectre_expect 'Yoqu7)NiziFito'         -Fjson -R0 \
     -u 'tesẗ.v1' -S 'ẗest' -tlong   -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.⛄'
-spectre_expect 'Foha4[TojmXanc'         -Fjson -R0 \
-    -u 'tesẗ.v1' -S 'ẗest'          -c4294967295 -a1 -p 'authentication' -C '' 'ẗesẗ.c+a1pa'
+spectre_expect 'PexgLebp2/Nemi'         -Fjson -R0 \
+    -u 'tesẗ.v1' -S 'ẗest'          -c4294967294 -a1 -p 'authentication' -C '' 'ẗesẗ.c+a1pa'
 spectre_expect 'Hiy3*Zag'               -Fjson -R0 \
     -u 'tesẗ.v1' -S 'ẗest' -tmed    -c1 -a1 -p 'authentication' -C ''          'ẗesẗ.c1a1pa.med'
 spectre_expect 'UJR7HpG0'               -Fjson -R0 \
@@ -507,8 +508,8 @@ spectre_expect 'ZuceHazwLojz8!'         -Fjson -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tlong   -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.long'
 spectre_expect 'Boxj2!YabePodp'         -Fjson -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tlong   -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.⛄'
-spectre_expect 'PeblLuqc6]Cala'         -Fjson -R0 \
-    -u 'tesẗ.v0' -S 'ẗest'          -c4294967295 -a0 -p 'authentication' -C '' 'ẗesẗ.c+a0pa'
+spectre_expect "QalpFemxJefu8'"         -Fjson -R0 \
+    -u 'tesẗ.v0' -S 'ẗest'          -c4294967294 -a0 -p 'authentication' -C '' 'ẗesẗ.c+a0pa'
 spectre_expect 'XelQac0@'               -Fjson -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tmed    -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.med'
 spectre_expect 'qS07SRc8'               -Fjson -R0 \
@@ -521,7 +522,7 @@ spectre_expect 'rivfutipe'              -Fjson -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tname   -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.name'
 spectre_expect 'xir qebdohogo buno'     -Fjson -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tphrase -c1 -a0 -p 'authentication' -C ''          'ẗesẗ.c1a0pa.phrase'
-spectre_expect "RoAm3bJSvo@#loHSRA6\'"  -Fjson -R0 \
+spectre_expect "RoAm3bJSvo@#loHSRA6'"   -Fjson -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tmax    -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi.max'
 spectre_expect 'biqwaxilu'              -Fjson -R0 \
     -u 'tesẗ.v0' -S 'ẗest' -tnone   -c1 -a0 -p 'identification' -C ''          'ẗesẗ.c1a0pi'

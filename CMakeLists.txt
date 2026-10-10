@@ -1,6 +1,6 @@
 ### CMAKE
+cmake_minimum_required( VERSION 3.10 )
 project( spectre-cli C )
-cmake_minimum_required( VERSION 3.0.2 )
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 
@@ -40,9 +40,11 @@ endif()
 ### DEPENDENCIES
 function( use_spectre_sodium t r )
     if( USE_SODIUM )
-        set( sodium_USE_STATIC_LIBS ON )
-        find_package( sodium )
-        if ( sodium_FOUND )
+        if( NOT TARGET sodium )
+            set( sodium_USE_STATIC_LIBS ON )
+            find_package( sodium )
+        endif()
+        if ( TARGET sodium )
             target_link_libraries( "${t}" PRIVATE sodium )
             target_compile_definitions( "${t}" PRIVATE -DSPECTRE_SODIUM=1 )
             message( STATUS     "${t}: USE_SODIUM is enabled." )
@@ -64,7 +66,7 @@ function( use_spectre_sodium t r )
     endif()
 endfunction()
 
-function( use_spectre_color t )
+function( use_spectre_color t r )
     if( USE_COLOR )
         find_package( Curses )
         if ( CURSES_FOUND )
@@ -90,7 +92,7 @@ function( use_spectre_color t )
     endif()
 endfunction()
 
-function( use_spectre_json t )
+function( use_spectre_json t r )
     if( USE_JSON )
         find_package( json-c )
         if ( json-c_FOUND )
@@ -177,11 +179,13 @@ if( BUILD_SPECTRE_TESTS )
     # target
     add_executable( spectre-tests "api/c/aes.c" "api/c/spectre-algorithm.c"
                               "api/c/spectre-algorithm_v0.c" "api/c/spectre-algorithm_v1.c" "api/c/spectre-algorithm_v2.c" "api/c/spectre-algorithm_v3.c"
-                              "api/c/spectre-types.c" "api/c/spectre-util.c" "src/spectre-tests-util.c" "src/spectre-tests.c" )
+                              "api/c/spectre-types.c" "api/c/spectre-util.c" "api/c/spectre-marshal-util.c" "api/c/spectre-marshal.c"
+                              "src/spectre-tests-util.c" "src/spectre-tests.c" )
     target_include_directories( spectre-tests PUBLIC api/c src )
     install( TARGETS spectre-tests RUNTIME DESTINATION bin )
 
     # dependencies
     use_spectre_sodium( spectre-tests required )
+    use_spectre_json( spectre-tests optional )
     use_spectre_xml( spectre-tests required )
 endif()

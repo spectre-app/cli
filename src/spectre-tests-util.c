@@ -67,7 +67,10 @@ xmlNodePtr spectre_xmlTestCaseNode(xmlNodePtr testCaseNode, const char *nodeName
         }
     }
 
-    err( "Missing parent: %s, for case: %s", parentId, spectre_xmlTestCaseString( testCaseNode, "id" ) );
+    xmlChar *id = spectre_xmlTestCaseString( testCaseNode, "id" );
+    err( "Missing parent: %s, for case: %s", parentId, id );
+    xmlFree( id );
+    xmlFree( parentId );
     return NULL;
 }
 

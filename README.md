@@ -77,7 +77,7 @@ By default, the build script only builds the `spectre` target.  You can specify 
 
  - `spectre`        : The main app.  Options: needed: `spectre_sodium`, optional: `spectre_color`, `spectre_json`.
  - `spectre-bench`  : A benchmark utility.  Options: needed: `spectre_sodium`.
- - `spectre-tests`  : An algorithm test suite.  Options: needed: `spectre_sodium`, `spectre_xml`.
+ - `spectre-tests`  : The algorithm & marshalling test suite.  Options: needed: `spectre_sodium`, `spectre_xml`, optional: `spectre_json`.
 
 It is smart to build the test suite along with the app, eg.:
 
@@ -122,7 +122,7 @@ Once the client is built, you should run a test suite to make sure everything wo
 
 There are currently two test programs:
 
- - `spectre-tests`     : Tests the algorithm implementation.
+ - `spectre-tests`     : Tests the algorithm implementation and the marshalling of user files.
  - `spectre-cli-tests` : Tests the CLI application.
 
 The `spectre-tests` program is only available if you enabled its target during build (see "Details" above).
